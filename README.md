@@ -1,7 +1,7 @@
 # WebRTC Native Demo
 
 ## Features
-- Support nvenc.
+- Support nvenc, video-codec-sdk-8.2
  
 ## Build Environment
 - VS2019
