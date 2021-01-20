@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "peerconnection_client", "peerconnection_client\peerconnection_client.vcxproj", "{ACFA6C18-9874-4B1B-A148-3C80BF7BF895}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "peerconnection_server", "peerconnection_server\peerconnection_server.vcxproj", "{D6B7EC3B-837F-4EB3-9325-8F7F81210151}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ACFA6C18-9874-4B1B-A148-3C80BF7BF895}.Debug|x64.ActiveCfg = Debug|x64
+		{ACFA6C18-9874-4B1B-A148-3C80BF7BF895}.Debug|x64.Build.0 = Debug|x64
+		{ACFA6C18-9874-4B1B-A148-3C80BF7BF895}.Release|x64.ActiveCfg = Release|x64
+		{ACFA6C18-9874-4B1B-A148-3C80BF7BF895}.Release|x64.Build.0 = Release|x64
+		{D6B7EC3B-837F-4EB3-9325-8F7F81210151}.Debug|x64.ActiveCfg = Debug|x64
+		{D6B7EC3B-837F-4EB3-9325-8F7F81210151}.Debug|x64.Build.0 = Debug|x64
+		{D6B7EC3B-837F-4EB3-9325-8F7F81210151}.Release|x64.ActiveCfg = Release|x64
+		{D6B7EC3B-837F-4EB3-9325-8F7F81210151}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B7CCFCCA-A5DE-469B-B871-5BA6B18AB723}
+	EndGlobalSection
+EndGlobal

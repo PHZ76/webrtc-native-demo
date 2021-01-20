@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="源文件\nvcodec">
+      <UniqueIdentifier>{3d80b034-b519-4f84-8893-20568d6d414f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\nvcodec\NvEncoder">
+      <UniqueIdentifier>{6a797128-3200-4bc5-97d3-addca476962f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="conductor.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="defaults.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main_wnd.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="peer_connection_client.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="vcm_capturer.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="test_video_capturer.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\NvCodec\NvEncoder\NvEncoder.cpp">
+      <Filter>源文件\nvcodec\NvEncoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\NvCodec\NvEncoder\NvEncoderD3D11.cpp">
+      <Filter>源文件\nvcodec\NvEncoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\NvCodec\nvenc.cpp">
+      <Filter>源文件\nvcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="nv_encoder.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="external_video_encoder_factory.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="conductor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="defaults.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main_wnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="peer_connection_client.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="vcm_capturer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="test_video_capturer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\NvCodec\NvEncoder\nvEncodeAPI.h">
+      <Filter>源文件\nvcodec\NvEncoder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\NvCodec\NvEncoder\NvEncoder.h">
+      <Filter>源文件\nvcodec\NvEncoder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\NvCodec\NvEncoder\NvEncoderD3D11.h">
+      <Filter>源文件\nvcodec\NvEncoder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\NvCodec\encoder_info.h">
+      <Filter>源文件\nvcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\NvCodec\nvenc.h">
+      <Filter>源文件\nvcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="external_video_encoder_factory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="nv_encoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
