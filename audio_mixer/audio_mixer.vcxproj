@@ -21,9 +21,9 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{acfa6c18-9874-4b1b-a148-3c80bf7bf895}</ProjectGuid>
-    <RootNamespace>peerconnectionclient</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <ProjectGuid>{8c1ddbc0-fe90-4b51-a8e9-76d578b4c137}</ProjectGuid>
+    <RootNamespace>audiomixer</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -72,13 +72,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)..\out\bin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
-    <IntDir>$(ProjectDir)..\out\objs\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)..\out\bin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
-    <IntDir>$(ProjectDir)..\out\objs\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -94,17 +90,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WEBRTC_WIN;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__STDC_CONSTANT_MACROS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\libyuv\include</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\dependencies\webrtc\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>webrtc.lib;d3d9.lib;dmoguids.lib;wmcodecdspuuid.lib;winmm.lib;crypt32.lib;iphlpapi.lib;secur32.lib;amstrmid.lib;msdmo.lib;d3d11.lib;dxgi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -113,36 +104,29 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WEBRTC_WIN;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__STDC_CONSTANT_MACROS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\libyuv\include</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\dependencies\webrtc\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>webrtc.lib;d3d9.lib;dmoguids.lib;wmcodecdspuuid.lib;winmm.lib;crypt32.lib;iphlpapi.lib;secur32.lib;amstrmid.lib;msdmo.lib;d3d11.lib;dxgi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WEBRTC_WIN;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__STDC_CONSTANT_MACROS;WEBRTC_WIN;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\dependencies\NvCodec;..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\libyuv\include</AdditionalIncludeDirectories>
-      <LanguageStandard>Default</LanguageStandard>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\libyuv\include;..\dependencies\ffmpeg\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\dependencies\webrtc\lib\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>webrtcd.lib;d3d9.lib;dmoguids.lib;wmcodecdspuuid.lib;winmm.lib;crypt32.lib;iphlpapi.lib;secur32.lib;amstrmid.lib;msdmo.lib;d3d11.lib;dxgi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\dependencies\ffmpeg\lib\x64;..\dependencies\webrtc\lib\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,47 +135,34 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WEBRTC_WIN;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__STDC_CONSTANT_MACROS;WEBRTC_WIN;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\dependencies\NvCodec;..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\libyuv\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\libyuv\include;..\dependencies\ffmpeg\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\dependencies\webrtc\lib\x64\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>webrtc.lib;d3d9.lib;dmoguids.lib;wmcodecdspuuid.lib;winmm.lib;crypt32.lib;iphlpapi.lib;secur32.lib;amstrmid.lib;msdmo.lib;d3d11.lib;dxgi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\dependencies\ffmpeg\lib\x64;..\dependencies\webrtc\lib\x64\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\dependencies\NvCodec\nvenc.cpp" />
-    <ClCompile Include="..\dependencies\NvCodec\NvEncoder\NvEncoder.cpp" />
-    <ClCompile Include="..\dependencies\NvCodec\NvEncoder\NvEncoderD3D11.cpp" />
-    <ClCompile Include="conductor.cc" />
-    <ClCompile Include="defaults.cc" />
-    <ClCompile Include="external_video_encoder_factory.cc" />
+    <ClCompile Include="audio_fifo.cc" />
+    <ClCompile Include="audio_mixer.cc" />
+    <ClCompile Include="audio_resampler.cc" />
     <ClCompile Include="main.cc" />
-    <ClCompile Include="main_wnd.cc" />
-    <ClCompile Include="nv_encoder.cc" />
-    <ClCompile Include="peer_connection_client.cc" />
-    <ClCompile Include="test_video_capturer.cc" />
-    <ClCompile Include="vcm_capturer.cc" />
+    <ClCompile Include="wav_file_source.cc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\dependencies\NvCodec\encoder_info.h" />
-    <ClInclude Include="..\dependencies\NvCodec\nvenc.h" />
-    <ClInclude Include="..\dependencies\NvCodec\NvEncoder\nvEncodeAPI.h" />
-    <ClInclude Include="..\dependencies\NvCodec\NvEncoder\NvEncoder.h" />
-    <ClInclude Include="..\dependencies\NvCodec\NvEncoder\NvEncoderD3D11.h" />
-    <ClInclude Include="conductor.h" />
-    <ClInclude Include="defaults.h" />
-    <ClInclude Include="external_video_encoder_factory.h" />
-    <ClInclude Include="main_wnd.h" />
-    <ClInclude Include="nv_encoder.h" />
-    <ClInclude Include="peer_connection_client.h" />
-    <ClInclude Include="test_video_capturer.h" />
-    <ClInclude Include="vcm_capturer.h" />
+    <ClInclude Include="audio_buffer.h" />
+    <ClInclude Include="audio_fifo.h" />
+    <ClInclude Include="audio_mixer.h" />
+    <ClInclude Include="audio_resampler.h" />
+    <ClInclude Include="byte_array.h" />
+    <ClInclude Include="wav_file_source.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
