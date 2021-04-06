@@ -1,4 +1,4 @@
-#include "nv_encoder.h"
+#include "qsv_encoder.h"
 
 #include <limits>
 #include <string>
@@ -37,7 +37,7 @@ enum NvVideoEncoderEvent
 	kH264EncoderEventMax = 16,
 };
 
-int NumberOfThreads(int width, int height, int number_of_cores) 
+int NumberOfThreads(int width, int height, int number_of_cores)
 {
 	// TODO(hbos): In Chromium, multiple threads do not work with sandbox on Mac,
 	// see crbug.com/583348. Until further investigated, only use one thread.
@@ -52,7 +52,7 @@ int NumberOfThreads(int width, int height, int number_of_cores)
 	//  }
 	// TODO(sprang): Also check sSliceArgument.uiSliceNum om GetEncoderPrams(),
 	//               before enabling multithreading here.
-  return 1;
+	return 1;
 }
 
 VideoFrameType ConvertToVideoFrameType(EVideoFrameType type) {
@@ -74,9 +74,9 @@ VideoFrameType ConvertToVideoFrameType(EVideoFrameType type) {
 }  // namespace
 
 static void RtpFragmentize(EncodedImage* encoded_image,
-                           const VideoFrameBuffer& frame_buffer,
-                           std::vector<uint8_t>& frame_packet,
-                           RTPFragmentationHeader* frag_header) 
+	const VideoFrameBuffer& frame_buffer,
+	std::vector<uint8_t>& frame_packet,
+	RTPFragmentationHeader* frag_header)
 {
 	size_t required_capacity = 0;
 	encoded_image->set_size(0);
@@ -102,37 +102,37 @@ static void RtpFragmentize(EncodedImage* encoded_image,
 	}
 }
 
-NvEncoder::NvEncoder(const cricket::VideoCodec& codec)
-    : packetization_mode_(H264PacketizationMode::SingleNalUnit),
-      max_payload_size_(0),
-      number_of_cores_(0),
-      encoded_image_callback_(nullptr),
-      has_reported_init_(false),
-      has_reported_error_(false),
-      num_temporal_layers_(1),
-      tl0sync_limit_(0) 
+QsvEncoder::QsvEncoder(const cricket::VideoCodec& codec)
+	: packetization_mode_(H264PacketizationMode::SingleNalUnit),
+	max_payload_size_(0),
+	number_of_cores_(0),
+	encoded_image_callback_(nullptr),
+	has_reported_init_(false),
+	has_reported_error_(false),
+	num_temporal_layers_(1),
+	tl0sync_limit_(0)
 {
 	RTC_CHECK(absl::EqualsIgnoreCase(codec.name, cricket::kH264CodecName));
 	std::string packetization_mode_string;
-	if (codec.GetParam(cricket::kH264FmtpPacketizationMode, &packetization_mode_string) 
+	if (codec.GetParam(cricket::kH264FmtpPacketizationMode, &packetization_mode_string)
 		&& packetization_mode_string == "1") {
 		packetization_mode_ = H264PacketizationMode::NonInterleaved;
 	}
 
 	encoded_images_.reserve(kMaxSimulcastStreams);
-	nv_encoders_.reserve(kMaxSimulcastStreams);
+	qsv_encoders_.reserve(kMaxSimulcastStreams);
 	configurations_.reserve(kMaxSimulcastStreams);
 	image_buffer_ = nullptr;
 }
 
-NvEncoder::~NvEncoder() 
+QsvEncoder::~QsvEncoder()
 {
 	Release();
 }
 
-int32_t NvEncoder::InitEncode(const VideoCodec* inst,
-                                   int32_t number_of_cores,
-                                   size_t max_payload_size) 
+int32_t QsvEncoder::InitEncode(const VideoCodec* inst,
+	int32_t number_of_cores,
+	size_t max_payload_size)
 {
 	ReportInit();
 	if (!inst || inst->codecType != kVideoCodecH264) {
@@ -164,7 +164,7 @@ int32_t NvEncoder::InitEncode(const VideoCodec* inst,
 	assert(number_of_streams == 1);
 
 	encoded_images_.resize(number_of_streams);
-	nv_encoders_.resize(number_of_streams);
+	qsv_encoders_.resize(number_of_streams);
 	configurations_.resize(number_of_streams);
 
 	number_of_cores_ = number_of_cores;
@@ -180,10 +180,10 @@ int32_t NvEncoder::InitEncode(const VideoCodec* inst,
 
 	num_temporal_layers_ = codec_.H264()->numberOfTemporalLayers;
 
-	for (int i = 0, idx = number_of_streams - 1; i < number_of_streams;  ++i, --idx) {
+	for (int i = 0, idx = number_of_streams - 1; i < number_of_streams; ++i, --idx) {
 		// Store nvidia encoder.
-		xop::NvidiaD3D11Encoder* nv_encoder = new xop::NvidiaD3D11Encoder();
-		nv_encoders_[i] = nv_encoder;
+		xop::IntelD3DEncoder* qsv_encoder = new xop::IntelD3DEncoder();
+		qsv_encoders_[i] = qsv_encoder;
 
 		// Set internal settings from codec_settings
 		configurations_[i].simulcast_idx = idx;
@@ -197,27 +197,27 @@ int32_t NvEncoder::InitEncode(const VideoCodec* inst,
 		// Codec_settings uses kbits/second; encoder uses bits/second.
 		configurations_[i].max_bps = codec_.maxBitrate * 1000;
 		configurations_[i].target_bps = codec_.maxBitrate * 1000 / 2;
-	
-		nv_encoder->SetOption(xop::VE_OPT_WIDTH, configurations_[i].width);
-		nv_encoder->SetOption(xop::VE_OPT_HEIGHT, configurations_[i].height);
-		nv_encoder->SetOption(xop::VE_OPT_FRAME_RATE, static_cast<int>(configurations_[i].max_frame_rate));
-		nv_encoder->SetOption(xop::VE_OPT_GOP, configurations_[i].key_frame_interval);
-		nv_encoder->SetOption(xop::VE_OPT_CODEC, xop::VE_OPT_CODEC_H264);
-		nv_encoder->SetOption(xop::VE_OPT_BITRATE_KBPS, configurations_[i].target_bps / 1000);
-		nv_encoder->SetOption(xop::VE_OPT_TEXTURE_FORMAT, xop::VE_OPT_FORMAT_B8G8R8A8);
-		if (!nv_encoder->Init()) {
+
+		qsv_encoder->SetOption(xop::VE_OPT_WIDTH, configurations_[i].width);
+		qsv_encoder->SetOption(xop::VE_OPT_HEIGHT, configurations_[i].height);
+		qsv_encoder->SetOption(xop::VE_OPT_FRAME_RATE, static_cast<int>(configurations_[i].max_frame_rate));
+		qsv_encoder->SetOption(xop::VE_OPT_GOP, configurations_[i].key_frame_interval);
+		qsv_encoder->SetOption(xop::VE_OPT_CODEC, xop::VE_OPT_CODEC_H264);
+		qsv_encoder->SetOption(xop::VE_OPT_BITRATE_KBPS, configurations_[i].target_bps / 1000);
+		qsv_encoder->SetOption(xop::VE_OPT_TEXTURE_FORMAT, xop::VE_OPT_FORMAT_NV12);
+		if (!qsv_encoder->Init()) {
 			Release();
 			ReportError();
 			return WEBRTC_VIDEO_CODEC_ERROR;
 		}
-		
+
 		image_buffer_.reset(new uint8_t[configurations_[i].width * configurations_[i].height * 10]);
 
 		// TODO(pbos): Base init params on these values before submitting.
 		video_format_ = EVideoFormatType::videoFormatI420;
 
 		// Initialize encoded image. Default buffer size: size of unencoded data.
-		const size_t new_capacity = CalcBufferSize(VideoType::kI420, 
+		const size_t new_capacity = CalcBufferSize(VideoType::kI420,
 			codec_.simulcastStream[idx].width, codec_.simulcastStream[idx].height);
 		encoded_images_[i].SetEncodedData(EncodedImageBuffer::Create(new_capacity));
 		encoded_images_[i]._completeFrame = true;
@@ -233,15 +233,16 @@ int32_t NvEncoder::InitEncode(const VideoCodec* inst,
 	return WEBRTC_VIDEO_CODEC_OK;
 }
 
-int32_t NvEncoder::Release() 
+int32_t QsvEncoder::Release()
 {
-	while (!nv_encoders_.empty()) {		
-		xop::NvidiaD3D11Encoder* nv_encoder = reinterpret_cast<xop::NvidiaD3D11Encoder*>(nv_encoders_.back());
-		if (nv_encoder) {
-			nv_encoder->Destroy();
-			delete nv_encoder;
+	while (!qsv_encoders_.empty())
+	{
+		xop::IntelD3DEncoder* qsv_encoder = reinterpret_cast<xop::IntelD3DEncoder*>(qsv_encoders_.back());
+		if (qsv_encoder) {
+			qsv_encoder->Destroy();
+			delete qsv_encoder;
 		}
-		nv_encoders_.pop_back();
+		qsv_encoders_.pop_back();
 	}
 
 	configurations_.clear();
@@ -250,13 +251,13 @@ int32_t NvEncoder::Release()
 	return WEBRTC_VIDEO_CODEC_OK;
 }
 
-int32_t NvEncoder::RegisterEncodeCompleteCallback(EncodedImageCallback* callback) 
+int32_t QsvEncoder::RegisterEncodeCompleteCallback(EncodedImageCallback* callback)
 {
 	encoded_image_callback_ = callback;
 	return WEBRTC_VIDEO_CODEC_OK;
 }
 
-void NvEncoder::SetRates(const RateControlParameters& parameters)
+void QsvEncoder::SetRates(const RateControlParameters& parameters)
 {
 	if (parameters.bitrate.get_sum_bps() == 0) {
 		// Encoder paused, turn off all encoding.
@@ -274,30 +275,30 @@ void NvEncoder::SetRates(const RateControlParameters& parameters)
 
 	codec_.maxFramerate = static_cast<uint32_t>(parameters.framerate_fps);
 
-	size_t stream_idx = nv_encoders_.size() - 1;
-	for (size_t i = 0; i < nv_encoders_.size(); ++i, --stream_idx) {
+	size_t stream_idx = qsv_encoders_.size() - 1;
+	for (size_t i = 0; i < qsv_encoders_.size(); ++i, --stream_idx) {
 		configurations_[i].target_bps = parameters.bitrate.GetSpatialLayerSum(stream_idx);
 		configurations_[i].max_frame_rate = static_cast<float>(parameters.framerate_fps);
 
 		if (configurations_[i].target_bps) {
 			configurations_[i].SetStreamState(true);
 
-			if (nv_encoders_[i]) {
-				xop::NvidiaD3D11Encoder* nv_encoder = reinterpret_cast<xop::NvidiaD3D11Encoder*>(nv_encoders_[i]);
-				nv_encoder->SetEvent(xop::VE_EVENT_RESET_BITRATE_KBPS, configurations_[i].target_bps/1000);
-				nv_encoder->SetEvent(xop::VE_EVENT_RESET_FRAME_RATE, static_cast<int>(configurations_[i].max_frame_rate));
+			if (qsv_encoders_[i]) {
+				xop::IntelD3DEncoder* qsv_encoder = reinterpret_cast<xop::IntelD3DEncoder*>(qsv_encoders_[i]);
+				qsv_encoder->SetEvent(xop::VE_EVENT_RESET_BITRATE_KBPS, configurations_[i].target_bps / 1000);
+				qsv_encoder->SetEvent(xop::VE_EVENT_RESET_FRAME_RATE, static_cast<int>(configurations_[i].max_frame_rate));
 			}
 			else {
 				configurations_[i].SetStreamState(false);
 			}
-		} 
+		}
 	}
 }
 
-int32_t NvEncoder::Encode(const VideoFrame& input_frame,
-						  const std::vector<VideoFrameType>* frame_types)
+int32_t QsvEncoder::Encode(const VideoFrame& input_frame,
+	const std::vector<VideoFrameType>* frame_types)
 {
-	if (nv_encoders_.empty()) {
+	if (qsv_encoders_.empty()) {
 		ReportError();
 		return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
 	}
@@ -326,12 +327,12 @@ int32_t NvEncoder::Encode(const VideoFrame& input_frame,
 			}
 		}
 	}
-	
+
 	RTC_DCHECK_EQ(configurations_[0].width, frame_buffer->width());
 	RTC_DCHECK_EQ(configurations_[0].height, frame_buffer->height());
 
 	// Encode image for each layer.
-	for (size_t i = 0; i < nv_encoders_.size(); ++i) {
+	for (size_t i = 0; i < qsv_encoders_.size(); ++i) {
 		if (!configurations_[i].sending) {
 			continue;
 		}
@@ -343,10 +344,10 @@ int32_t NvEncoder::Encode(const VideoFrame& input_frame,
 			}
 		}
 
-		if (send_key_frame) {			
-			if (!nv_encoders_.empty() && nv_encoders_[i]) {
-				xop::NvidiaD3D11Encoder* nv_encoder = reinterpret_cast<xop::NvidiaD3D11Encoder*>(nv_encoders_[i]);
-				nv_encoder->SetEvent(xop::VE_EVENT_FORCE_IDR, 1);
+		if (send_key_frame) {
+			if (!qsv_encoders_.empty() && qsv_encoders_[i]) {
+				xop::IntelD3DEncoder* qsv_encoder = reinterpret_cast<xop::IntelD3DEncoder*>(qsv_encoders_[i]);
+				qsv_encoder->SetEvent(xop::VE_EVENT_FORCE_IDR, 1);
 			}
 
 			configurations_[i].key_frame_request = false;
@@ -364,13 +365,11 @@ int32_t NvEncoder::Encode(const VideoFrame& input_frame,
 		}
 		else {
 			if ((frame_packet[4] & 0x1f) == 0x07) {
-				info.eFrameType = videoFrameTypeIDR; 
-			}
-			else if ((frame_packet[4] & 0x1f) == 0x01) {
-				info.eFrameType = videoFrameTypeP;
+				// sps + pps + idr
+				info.eFrameType = videoFrameTypeIDR;
 			}
 			else {
-				return WEBRTC_VIDEO_CODEC_OK;
+				info.eFrameType = videoFrameTypeP;
 			}
 		}
 
@@ -382,8 +381,8 @@ int32_t NvEncoder::Encode(const VideoFrame& input_frame,
 		encoded_images_[i].rotation_ = input_frame.rotation();
 		encoded_images_[i].SetColorSpace(input_frame.color_space());
 		encoded_images_[i].content_type_ = (codec_.mode == VideoCodecMode::kScreensharing)
-											? VideoContentType::SCREENSHARE
-											: VideoContentType::UNSPECIFIED;
+			? VideoContentType::SCREENSHARE
+			: VideoContentType::UNSPECIFIED;
 		encoded_images_[i].timing_.flags = VideoSendTiming::kInvalid;
 		encoded_images_[i]._frameType = ConvertToVideoFrameType(info.eFrameType);
 		encoded_images_[i].SetSpatialIndex(configurations_[i].simulcast_idx);
@@ -398,7 +397,7 @@ int32_t NvEncoder::Encode(const VideoFrame& input_frame,
 		if (encoded_images_[i].size() > 0) {
 			// Parse QP.
 			h264_bitstream_parser_.ParseBitstream(encoded_images_[i].data(),
-			                                      encoded_images_[i].size());
+				encoded_images_[i].size());
 			h264_bitstream_parser_.GetLastSliceQp(&encoded_images_[i].qp_);
 
 			// Deliver encoded image.
@@ -408,6 +407,12 @@ int32_t NvEncoder::Encode(const VideoFrame& input_frame,
 			codec_specific.codecSpecific.H264.temporal_idx = kNoTemporalIdx;
 			codec_specific.codecSpecific.H264.idr_frame = (info.eFrameType == videoFrameTypeIDR);
 			codec_specific.codecSpecific.H264.base_layer_sync = false;
+
+			// if (info.eFrameType == videoFrameTypeIDR &&
+			//    encoded_images_[i]._frameType == kVideoFrameKey) {
+			//  RTC_LOG(LS_ERROR) << "send idr frame - " << encoded_images_[i].size();
+			//}
+
 			encoded_image_callback_->OnEncodedImage(encoded_images_[i], &codec_specific, &frag_header);
 		}
 	}
@@ -415,36 +420,36 @@ int32_t NvEncoder::Encode(const VideoFrame& input_frame,
 	return WEBRTC_VIDEO_CODEC_OK;
 }
 
-void NvEncoder::ReportInit() 
+void QsvEncoder::ReportInit()
 {
 	if (has_reported_init_)
 		return;
-	RTC_HISTOGRAM_ENUMERATION("WebRTC.Video.NvEncoder.Event",
-							kH264EncoderEventInit, kH264EncoderEventMax);
+	RTC_HISTOGRAM_ENUMERATION("WebRTC.Video.QsvEncoder.Event",
+		kH264EncoderEventInit, kH264EncoderEventMax);
 	has_reported_init_ = true;
 }
 
-void NvEncoder::ReportError() 
+void QsvEncoder::ReportError()
 {
 	if (has_reported_error_)
 		return;
-	RTC_HISTOGRAM_ENUMERATION("WebRTC.Video.NvEncoder.Event",
-							kH264EncoderEventError, kH264EncoderEventMax);
+	RTC_HISTOGRAM_ENUMERATION("WebRTC.Video.QsvEncoder.Event",
+		kH264EncoderEventError, kH264EncoderEventMax);
 	has_reported_error_ = true;
 }
 
-VideoEncoder::EncoderInfo NvEncoder::GetEncoderInfo() const 
+VideoEncoder::EncoderInfo QsvEncoder::GetEncoderInfo() const
 {
 	EncoderInfo info;
 	info.supports_native_handle = false;
-	info.implementation_name = "NvEncoder";
+	info.implementation_name = "QsvEncoder";
 	info.scaling_settings = VideoEncoder::ScalingSettings(kLowH264QpThreshold, kHighH264QpThreshold);
 	info.is_hardware_accelerated = true;
 	info.has_internal_source = false;
 	return info;
 }
 
-void NvEncoder::LayerConfig::SetStreamState(bool send_stream) 
+void QsvEncoder::LayerConfig::SetStreamState(bool send_stream)
 {
 	if (send_stream && !sending) {
 		// Need a key frame if we have not sent this stream before.
@@ -453,22 +458,22 @@ void NvEncoder::LayerConfig::SetStreamState(bool send_stream)
 	sending = send_stream;
 }
 
-bool NvEncoder::EncodeFrame(int index, const VideoFrame& input_frame,
-							std::vector<uint8_t>& frame_packet) 
+bool QsvEncoder::EncodeFrame(int index, const VideoFrame& input_frame,
+	std::vector<uint8_t>& frame_packet)
 {
 	frame_packet.clear();
 
-	if (nv_encoders_.empty() || !nv_encoders_[index]) {
+	if (qsv_encoders_.empty() || !qsv_encoders_[index]) {
 		return false;
 	}
 
 	if (video_format_ == EVideoFormatType::videoFormatI420) {
 		if (image_buffer_ != nullptr) {
-			if (webrtc::ConvertFromI420(input_frame, webrtc::VideoType::kARGB, 0,
-										image_buffer_.get()) < 0) {
+			if (webrtc::ConvertFromI420(input_frame, webrtc::VideoType::kNV12, 0,
+				image_buffer_.get()) < 0) {
 				return false;
 			}
-		} 
+		}
 		else {
 			return false;
 		}
@@ -476,16 +481,16 @@ bool NvEncoder::EncodeFrame(int index, const VideoFrame& input_frame,
 
 	int width = input_frame.width();
 	int height = input_frame.height();
-	int image_size = width * height * 4; // argb
+	int image_size = width * height * 3 / 2; // nv12
 
-	xop::NvidiaD3D11Encoder* nv_encoder = reinterpret_cast<xop::NvidiaD3D11Encoder*>(nv_encoders_[index]);
-	if (nv_encoder) {
-		int frame_size = nv_encoder->Encode(std::vector<uint8_t>(image_buffer_.get(), image_buffer_.get() + image_size) ,frame_packet);
+	xop::IntelD3DEncoder* qsv_encoder = reinterpret_cast<xop::IntelD3DEncoder*>(qsv_encoders_[index]);
+	if (qsv_encoder) {
+		int frame_size = qsv_encoder->Encode(std::vector<uint8_t>(image_buffer_.get(), image_buffer_.get() + image_size), frame_packet);
 		if (frame_size < 0) {
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 

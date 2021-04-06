@@ -1,5 +1,5 @@
-#ifndef MODULES_NV_VIDEO_CODING_CODECS_H264_ENCODER_IMPL_H_
-#define MODULES_NV_VIDEO_CODING_CODECS_H264_ENCODER_IMPL_H_
+#ifndef MODULES_QSV_VIDEO_CODING_CODECS_H264_ENCODER_IMPL_H_
+#define MODULES_QSV_VIDEO_CODING_CODECS_H264_ENCODER_IMPL_H_
 
 #include <memory>
 #include <vector>
@@ -15,13 +15,13 @@
 #include <d3d11.h>
 #include <dxgi1_2.h>
 
-#include "encoder/nvidia_d3d11_encoder.h"
+#include "encoder/intel_d3d_encoder.h"
 
 namespace webrtc {
 
-class NvEncoder : public VideoEncoder {
+class QsvEncoder : public VideoEncoder {
 public:
-	struct LayerConfig 
+	struct LayerConfig
 	{
 		int simulcast_idx = 0;
 		int width = -1;
@@ -38,16 +38,15 @@ public:
 	};
 
 public:
-	explicit NvEncoder(const cricket::VideoCodec& codec);
-	~NvEncoder() override;
+	explicit QsvEncoder(const cricket::VideoCodec& codec);
+	~QsvEncoder() override;
 
 	int32_t InitEncode(const VideoCodec* codec_settings,
-						int32_t number_of_cores,
-						size_t max_payload_size) override;
+					   int32_t number_of_cores,
+					   size_t max_payload_size) override;
 	int32_t Release() override;
 
-	int32_t RegisterEncodeCompleteCallback(
-		EncodedImageCallback* callback) override;
+	int32_t RegisterEncodeCompleteCallback(EncodedImageCallback* callback) override;
 
 	void SetRates(const RateControlParameters& parameters) override;
 
@@ -69,10 +68,10 @@ private:
 	void ReportInit();
 	void ReportError();
 
-	bool EncodeFrame(int index,const VideoFrame& input_frame,
-					std::vector<uint8_t>& frame_packet);
+	bool EncodeFrame(int index, const VideoFrame& input_frame,
+					 std::vector<uint8_t>& frame_packet);
 
-	std::vector<void*> nv_encoders_;
+	std::vector<void*> qsv_encoders_;
 	std::vector<LayerConfig> configurations_;
 	std::vector<EncodedImage> encoded_images_;
 
@@ -93,4 +92,4 @@ private:
 
 }  // namespace webrtc
 
-#endif  // MODULES_NV_VIDEO_CODING_CODECS_H264_ENCODER_IMPL_H_
+#endif  // MODULES_QSV_VIDEO_CODING_CODECS_H264_ENCODER_IMPL_H_

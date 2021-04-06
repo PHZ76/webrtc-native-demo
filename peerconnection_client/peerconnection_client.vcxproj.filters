@@ -19,6 +19,15 @@
     <Filter Include="源文件\nvcodec\NvEncoder">
       <UniqueIdentifier>{6a797128-3200-4bc5-97d3-addca476962f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\encoder">
+      <UniqueIdentifier>{d4973f1d-dcdb-4e86-8a40-aca7af829404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\qsvcodec">
+      <UniqueIdentifier>{35ca12cb-4913-42b0-bef3-aa1802ede499}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\qsvcodec\src">
+      <UniqueIdentifier>{33c43a50-c348-4c5d-9f66-cacd80e2e61a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="conductor.cc">
@@ -48,13 +57,64 @@
     <ClCompile Include="..\dependencies\NvCodec\NvEncoder\NvEncoderD3D11.cpp">
       <Filter>源文件\nvcodec\NvEncoder</Filter>
     </ClCompile>
-    <ClCompile Include="..\dependencies\NvCodec\nvenc.cpp">
-      <Filter>源文件\nvcodec</Filter>
-    </ClCompile>
     <ClCompile Include="nv_encoder.cc">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="external_video_encoder_factory.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="encoder\nvidia_d3d11_encoder.cc">
+      <Filter>源文件\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\common_directx9.cpp">
+      <Filter>源文件\qsvcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\common_directx11.cpp">
+      <Filter>源文件\qsvcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\common_utils.cpp">
+      <Filter>源文件\qsvcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\common_utils_windows.cpp">
+      <Filter>源文件\qsvcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_critical_section.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_dispatcher.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_dispatcher_log.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_dxva2_device.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_function_table.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_library_iterator.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_load_dll.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_load_plugin.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_plugin_hive.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_win_reg_key.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\QsvCodec\src\qsv_main.cpp">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="encoder\intel_d3d_encoder.cc">
+      <Filter>源文件\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="qsv_encoder.cc">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,16 +146,70 @@
     <ClInclude Include="..\dependencies\NvCodec\NvEncoder\NvEncoderD3D11.h">
       <Filter>源文件\nvcodec\NvEncoder</Filter>
     </ClInclude>
-    <ClInclude Include="..\dependencies\NvCodec\encoder_info.h">
-      <Filter>源文件\nvcodec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\NvCodec\nvenc.h">
-      <Filter>源文件\nvcodec</Filter>
-    </ClInclude>
     <ClInclude Include="external_video_encoder_factory.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="nv_encoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="encoder\nvidia_d3d11_encoder.h">
+      <Filter>源文件\encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="encoder\video_encoder.h">
+      <Filter>源文件\encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\common_directx9.h">
+      <Filter>源文件\qsvcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\common_directx11.h">
+      <Filter>源文件\qsvcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\common_utils.h">
+      <Filter>源文件\qsvcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_critical_section.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_dispatcher.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_dispatcher_defs.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_dispatcher_log.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_dxva2_device.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_exposed_functions_list.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_library_iterator.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_load_dll.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_load_plugin.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_plugin_hive.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_vector.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_win_reg_key.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfxaudio_exposed_functions_list.h">
+      <Filter>源文件\qsvcodec\src</Filter>
+    </ClInclude>
+    <ClInclude Include="encoder\intel_d3d_encoder.h">
+      <Filter>源文件\encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="qsv_encoder.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

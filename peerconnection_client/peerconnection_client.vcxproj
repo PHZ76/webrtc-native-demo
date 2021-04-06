@@ -134,7 +134,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WEBRTC_WIN;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\dependencies\NvCodec;..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\libyuv\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dependencies\QsvCodec\include;..\dependencies\QsvCodec;..\dependencies\NvCodec;..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\libyuv\include</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -142,7 +142,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\dependencies\webrtc\lib\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>webrtcd.lib;d3d9.lib;dmoguids.lib;wmcodecdspuuid.lib;winmm.lib;crypt32.lib;iphlpapi.lib;secur32.lib;amstrmid.lib;msdmo.lib;d3d11.lib;dxgi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>webrtcd.lib;d3d9.lib;dxva2.lib;dmoguids.lib;wmcodecdspuuid.lib;winmm.lib;crypt32.lib;iphlpapi.lib;secur32.lib;amstrmid.lib;msdmo.lib;d3d11.lib;dxgi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -153,7 +153,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WEBRTC_WIN;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\dependencies\NvCodec;..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\libyuv\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dependencies\QsvCodec\include;..\dependencies\QsvCodec;..\dependencies\NvCodec;..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\libyuv\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,35 +161,70 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\dependencies\webrtc\lib\x64\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>webrtc.lib;d3d9.lib;dmoguids.lib;wmcodecdspuuid.lib;winmm.lib;crypt32.lib;iphlpapi.lib;secur32.lib;amstrmid.lib;msdmo.lib;d3d11.lib;dxgi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>webrtc.lib;d3d9.lib;dxva2.lib;dmoguids.lib;wmcodecdspuuid.lib;winmm.lib;crypt32.lib;iphlpapi.lib;secur32.lib;amstrmid.lib;msdmo.lib;d3d11.lib;dxgi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\dependencies\NvCodec\nvenc.cpp" />
     <ClCompile Include="..\dependencies\NvCodec\NvEncoder\NvEncoder.cpp" />
     <ClCompile Include="..\dependencies\NvCodec\NvEncoder\NvEncoderD3D11.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\common_directx11.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\common_directx9.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\common_utils.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\common_utils_windows.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_critical_section.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_dispatcher.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_dispatcher_log.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_dxva2_device.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_function_table.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_library_iterator.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_load_dll.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_load_plugin.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_plugin_hive.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\mfx_win_reg_key.cpp" />
+    <ClCompile Include="..\dependencies\QsvCodec\src\qsv_main.cpp" />
     <ClCompile Include="conductor.cc" />
     <ClCompile Include="defaults.cc" />
+    <ClCompile Include="encoder\intel_d3d_encoder.cc" />
+    <ClCompile Include="encoder\nvidia_d3d11_encoder.cc" />
     <ClCompile Include="external_video_encoder_factory.cc" />
     <ClCompile Include="main.cc" />
     <ClCompile Include="main_wnd.cc" />
     <ClCompile Include="nv_encoder.cc" />
     <ClCompile Include="peer_connection_client.cc" />
+    <ClCompile Include="qsv_encoder.cc" />
     <ClCompile Include="test_video_capturer.cc" />
     <ClCompile Include="vcm_capturer.cc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\dependencies\NvCodec\encoder_info.h" />
-    <ClInclude Include="..\dependencies\NvCodec\nvenc.h" />
     <ClInclude Include="..\dependencies\NvCodec\NvEncoder\nvEncodeAPI.h" />
     <ClInclude Include="..\dependencies\NvCodec\NvEncoder\NvEncoder.h" />
     <ClInclude Include="..\dependencies\NvCodec\NvEncoder\NvEncoderD3D11.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\common_directx11.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\common_directx9.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\common_utils.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfxaudio_exposed_functions_list.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_critical_section.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_dispatcher.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_dispatcher_defs.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_dispatcher_log.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_dxva2_device.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_exposed_functions_list.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_library_iterator.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_load_dll.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_load_plugin.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_plugin_hive.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_vector.h" />
+    <ClInclude Include="..\dependencies\QsvCodec\src\mfx_win_reg_key.h" />
     <ClInclude Include="conductor.h" />
     <ClInclude Include="defaults.h" />
+    <ClInclude Include="encoder\intel_d3d_encoder.h" />
+    <ClInclude Include="encoder\video_encoder.h" />
+    <ClInclude Include="encoder\nvidia_d3d11_encoder.h" />
     <ClInclude Include="external_video_encoder_factory.h" />
     <ClInclude Include="main_wnd.h" />
     <ClInclude Include="nv_encoder.h" />
     <ClInclude Include="peer_connection_client.h" />
+    <ClInclude Include="qsv_encoder.h" />
     <ClInclude Include="test_video_capturer.h" />
     <ClInclude Include="vcm_capturer.h" />
   </ItemGroup>

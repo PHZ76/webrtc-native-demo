@@ -74,6 +74,15 @@ int PASCAL wWinMain(HINSTANCE instance,
                     HINSTANCE prev_instance,
                     wchar_t* cmd_line,
                     int cmd_show) {
+
+//if (GetConsoleWindow() == NULL)
+//{
+//    AllocConsole();
+//    freopen("CONOUT$", "w+t", stdout);
+//    freopen("CONOUT$", "w+t", stderr);
+
+//}
+
   rtc::WinsockInitializer winsock_init;
   rtc::Win32SocketServer w32_ss;
   rtc::Win32Thread w32_thread(&w32_ss);

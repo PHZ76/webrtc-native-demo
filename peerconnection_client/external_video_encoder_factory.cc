@@ -10,6 +10,7 @@
 #include "api/video_codecs/sdp_video_format.h"
 
 #include "nv_encoder.h"
+#include "qsv_encoder.h"
 
 namespace webrtc {
 
@@ -35,8 +36,11 @@ public:
 		const webrtc::SdpVideoFormat& format) override {
 		if (absl::EqualsIgnoreCase(format.name, cricket::kH264CodecName)) {
 			if (webrtc::H264Encoder::IsSupported()) {
-				if (nvenc_info.is_supported()) {
+				if (xop::NvidiaD3D11Encoder::IsSupported()) {
 					return absl::make_unique<webrtc::NvEncoder>(cricket::VideoCodec(format));
+				}
+				else if (xop::IntelD3DEncoder::IsSupported()) {
+					return absl::make_unique<webrtc::QsvEncoder>(cricket::VideoCodec(format));
 				}
 				else {
 					return webrtc::H264Encoder::Create(cricket::VideoCodec(format));

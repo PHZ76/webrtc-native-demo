@@ -343,7 +343,7 @@ void MainWnd::OnDefaultAction() {
     if (sel != LB_ERR) {
       LRESULT peer_id = ::SendMessage(listbox_, LB_GETITEMDATA, sel, 0);
       if (peer_id != -1 && callback_) {
-        callback_->ConnectToPeer(peer_id);
+        callback_->ConnectToPeer(static_cast<int>(peer_id));
       }
     }
   } else {
