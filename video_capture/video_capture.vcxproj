@@ -157,7 +157,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d_renderer.h" />
-    <ClInclude Include="desktop_capturer.h" />
     <ClInclude Include="video_renderer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

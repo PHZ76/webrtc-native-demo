@@ -7,7 +7,7 @@
  *  in the file PATENTS.  All contributing project authors may
  *  be found in the AUTHORS file in the root of the source tree.
  */
-#include "test/video_renderer.h"
+#include "video_renderer.h"
 
 // TODO(pbos): Android renderer
 

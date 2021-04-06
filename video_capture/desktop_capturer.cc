@@ -33,9 +33,15 @@ bool DesktopCapturer::GetWindowSourceList(webrtc::DesktopCapturer::SourceList& s
     return desktop_capturer->GetSourceList(&source_list);
 }
 
-std::shared_ptr<DesktopCapturer> DesktopCapturer::Create()
+std::unique_ptr<DesktopCapturer> DesktopCapturer::Create(SourceId source_id, size_t target_fps, size_t out_width, size_t out_height)
 {
-    std::shared_ptr<DesktopCapturer> screen_capture(new DesktopCapturer());
+    std::unique_ptr<DesktopCapturer> screen_capture(new DesktopCapturer());
+    if (!screen_capture->Init(source_id, target_fps, out_width, out_height)) {
+        RTC_LOG(LS_WARNING) << "Failed to create VcmCapturer(w = " << out_width
+            << ", h = " << out_height << ", fps = " << target_fps
+            << ")";
+        return nullptr;
+    }
     return screen_capture;
 }
 
@@ -194,18 +200,14 @@ void DesktopCapturer::OnCaptureResult(webrtc::DesktopCapturer::Result result, st
     int height = frame->size().height();
     rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(width, height);
 
-    if (!i420_buffer.get() ||
-        i420_buffer->width() * i420_buffer->height() < width * height) {
-        i420_buffer = webrtc::I420Buffer::Create(width, height);
-    }
-
     libyuv::ConvertToI420(frame->data(), 0, i420_buffer->MutableDataY(),
-                        i420_buffer->StrideY(), i420_buffer->MutableDataU(),
-                        i420_buffer->StrideU(), i420_buffer->MutableDataV(),
-                        i420_buffer->StrideV(), 0, 0, width, height, width,
-                        height, libyuv::kRotate0, libyuv::FOURCC_ARGB);
+        i420_buffer->StrideY(), i420_buffer->MutableDataU(),
+        i420_buffer->StrideU(), i420_buffer->MutableDataV(),
+        i420_buffer->StrideV(), 0, 0, width, height,
+        i420_buffer->width(), i420_buffer->height(),
+        libyuv::kRotate0, libyuv::FOURCC_ARGB);
 
-    auto video_frame = webrtc::VideoFrame(i420_buffer, 0, 0, webrtc::kVideoRotation_0);
+    auto video_frame = webrtc::VideoFrame(i420_buffer, webrtc::kVideoRotation_0, rtc::TimeMicros());
     if (frame_callback_) {
         frame_callback_(video_frame);
     }

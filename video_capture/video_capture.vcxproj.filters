@@ -29,9 +29,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="desktop_capturer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="d3d_renderer.h">
       <Filter>头文件</Filter>
     </ClInclude>

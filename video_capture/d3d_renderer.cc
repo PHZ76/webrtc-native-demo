@@ -11,6 +11,7 @@
 
 #include "common_video/libyuv/include/webrtc_libyuv.h"
 #include "rtc_base/checks.h"
+#include <mutex>
 
 namespace webrtc {
 namespace test {
@@ -27,6 +28,8 @@ const char kD3DClassName[] = "d3d_renderer";
 VideoRenderer* VideoRenderer::CreatePlatformRenderer(const char* window_title,
                                                      size_t width,
                                                      size_t height) {
+  static std::mutex mutex;
+  std::lock_guard<std::mutex> locker(mutex);
   return D3dRenderer::Create(window_title, width, height);
 }
 
