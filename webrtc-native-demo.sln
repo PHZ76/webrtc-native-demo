@@ -13,7 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "module", "module", "{1A83D6
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "audio_mixer", "audio_mixer\audio_mixer.vcxproj", "{8C1DDBC0-FE90-4B51-A8E9-76D578B4C137}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "screen_capture", "video_capture\video_capture.vcxproj", "{6463E18C-0672-4AB5-A22C-DA1BC8CF79C9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "video_capture", "video_capture\video_capture.vcxproj", "{6463E18C-0672-4AB5-A22C-DA1BC8CF79C9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "p2p_demo", "p2p_demo", "{2C9E0B5C-F7A3-47A5-ADEE-D7EAC7026932}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p", "p2p\p2p.vcxproj", "{79FF766B-490C-46CB-8F78-ECD29BF8A2B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +59,14 @@ Global
 		{6463E18C-0672-4AB5-A22C-DA1BC8CF79C9}.Release|x64.Build.0 = Release|x64
 		{6463E18C-0672-4AB5-A22C-DA1BC8CF79C9}.Release|x86.ActiveCfg = Release|Win32
 		{6463E18C-0672-4AB5-A22C-DA1BC8CF79C9}.Release|x86.Build.0 = Release|Win32
+		{79FF766B-490C-46CB-8F78-ECD29BF8A2B1}.Debug|x64.ActiveCfg = Debug|x64
+		{79FF766B-490C-46CB-8F78-ECD29BF8A2B1}.Debug|x64.Build.0 = Debug|x64
+		{79FF766B-490C-46CB-8F78-ECD29BF8A2B1}.Debug|x86.ActiveCfg = Debug|Win32
+		{79FF766B-490C-46CB-8F78-ECD29BF8A2B1}.Debug|x86.Build.0 = Debug|Win32
+		{79FF766B-490C-46CB-8F78-ECD29BF8A2B1}.Release|x64.ActiveCfg = Release|x64
+		{79FF766B-490C-46CB-8F78-ECD29BF8A2B1}.Release|x64.Build.0 = Release|x64
+		{79FF766B-490C-46CB-8F78-ECD29BF8A2B1}.Release|x86.ActiveCfg = Release|Win32
+		{79FF766B-490C-46CB-8F78-ECD29BF8A2B1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +76,7 @@ Global
 		{D6B7EC3B-837F-4EB3-9325-8F7F81210151} = {27D5CB30-4B9C-4691-B3BE-962C56308460}
 		{8C1DDBC0-FE90-4B51-A8E9-76D578B4C137} = {1A83D67D-3DF5-4276-8D0F-84495864BC09}
 		{6463E18C-0672-4AB5-A22C-DA1BC8CF79C9} = {1A83D67D-3DF5-4276-8D0F-84495864BC09}
+		{79FF766B-490C-46CB-8F78-ECD29BF8A2B1} = {2C9E0B5C-F7A3-47A5-ADEE-D7EAC7026932}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B7CCFCCA-A5DE-469B-B871-5BA6B18AB723}
