@@ -65,6 +65,14 @@ bool P2PClient::Connect(uint16_t port, std::string ip, int timeout_msec)
 
 		while (connection_) {
 			mg_mgr_poll(&mgr_, 100);
+
+			//static int64_t update_ts = rtc::TimeMillis();
+			//if (update_ts + 5000 <= rtc::TimeMillis()) {
+			//	update_ts = rtc::TimeMillis();
+			//	if (p2p_session_) {
+			//		p2p_session_->SendOverDataChannel("hello");
+			//	}
+			//}
 		}
 
 		p2p_session_ = nullptr;

@@ -2,12 +2,14 @@
 
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
+#include "api/data_channel_interface.h"
 #include <string>
 #include <thread>
 #include <functional>
 
-class P2PSession : public webrtc::PeerConnectionObserver,
-				   public webrtc::CreateSessionDescriptionObserver
+class P2PSession : public webrtc::PeerConnectionObserver
+				 , public webrtc::CreateSessionDescriptionObserver
+				 , public webrtc::DataChannelObserver
 {
 public:
 	using WriteCallback = std::function<void(std::string)>;
@@ -27,8 +29,13 @@ public:
 	bool AddVideoRenderer(std::shared_ptr<rtc::VideoSinkInterface<webrtc::VideoFrame>> video_renderer);
 	bool SendOffer();
 	
+	void SendOverDataChannel(std::string data);
+
 protected:
 	void OnWrite(std::string message);
+	bool CreateConnection();
+	bool AddTracks();
+	bool CreateDataChannel();
 	bool SendAnswer();
 	bool SetOffer(std::string sdp);
 	bool SetAnswer(std::string sdp);
@@ -39,7 +46,7 @@ protected:
 	void OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
 					const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>& streams) override;
 	void OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) override;
-	void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override {}
+	void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
 	void OnRenegotiationNeeded() override {}
 	void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state) override {}
 	void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override {}
@@ -50,8 +57,10 @@ protected:
 	void OnSuccess(webrtc::SessionDescriptionInterface* desc) override;
 	void OnFailure(webrtc::RTCError error) override;
 
-	bool CreateConnection();
-	bool AddTracks();
+	// DataChannelObserver implementation.
+	void OnStateChange() override;
+	void OnMessage(const webrtc::DataBuffer& buffer) override;
+	void OnBufferedAmountChange(uint64_t previous_amount) override {}
 
 	WriteCallback write_callback_;
 	webrtc::PeerConnectionFactoryInterface* peer_connection_factory_ = nullptr;
@@ -64,4 +73,6 @@ protected:
 	rtc::scoped_refptr<webrtc::VideoTrackSourceInterface>   video_source_;
 
 	std::shared_ptr<rtc::VideoSinkInterface<webrtc::VideoFrame>> video_renderer_;
+
+	rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel_;
 };

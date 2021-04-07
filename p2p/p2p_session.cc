@@ -135,6 +135,10 @@ bool P2PSession::SendOffer()
 
 	}
 
+	if (!CreateDataChannel()) {
+
+	}
+
 	auto options = webrtc::PeerConnectionInterface::RTCOfferAnswerOptions();
 	options.offer_to_receive_video = 1;
 	options.offer_to_receive_audio = 1;
@@ -252,6 +256,18 @@ bool P2PSession::AddTracks()
 	return true;
 }
 
+bool P2PSession::CreateDataChannel()
+{
+	if (!peer_connection_) {
+		return false;
+	}
+
+	webrtc::DataChannelInit config;
+	data_channel_ = peer_connection_->CreateDataChannel("data_channel", &config);
+	data_channel_->RegisterObserver(this);
+	return true;
+}
+
 void P2PSession::OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
 							const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>& streams)
 {
@@ -268,6 +284,12 @@ void P2PSession::OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> rec
 void P2PSession::OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver)
 {
 
+}
+
+void P2PSession::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel)
+{
+	data_channel_ = channel;
+	data_channel_->RegisterObserver(this);
 }
 
 void P2PSession::OnIceCandidate(const webrtc::IceCandidateInterface* candidate)
@@ -306,4 +328,38 @@ void P2PSession::OnSuccess(webrtc::SessionDescriptionInterface* desc)
 void P2PSession::OnFailure(webrtc::RTCError error)
 {
 	LOG_ERROR("%s : %s", ToString(error.type()), error.message());
+}
+
+void P2PSession::SendOverDataChannel(std::string data)
+{
+	if (!data_channel_) {
+		return;
+	}
+
+	if (data_channel_->state() != webrtc::DataChannelInterface::kOpen) {
+		return;
+	}
+
+	rtc::CopyOnWriteBuffer buffer(data.c_str(), data.size());
+	webrtc::DataBuffer data_buffer(buffer, true);
+	data_channel_->Send(data_buffer);
+}
+
+void P2PSession::OnStateChange()
+{
+	webrtc::DataChannelInterface::DataState state = data_channel_->state();
+	if (state == webrtc::DataChannelInterface::kClosed) {
+
+	}
+}
+
+void P2PSession::OnMessage(const webrtc::DataBuffer& buffer)
+{
+	if (data_channel_->state() != webrtc::DataChannelInterface::kOpen) {
+		return;
+	}
+
+	const char* data = buffer.data.data<char>();
+	size_t length = buffer.data.size();
+	//printf("data: %s \n", std::string(data, length).c_str());
 }
