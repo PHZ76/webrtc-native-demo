@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{c1c9e4a4-74a5-4414-99eb-78a62be4269f}</ProjectGuid>
+    <RootNamespace>zrtc</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ProjectDir)..\out\bin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(ProjectDir)..\out\objs\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(ProjectDir)..\out\bin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(ProjectDir)..\out\objs\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NOMINMAX;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\opus\src\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\boringssl\src\include;..\dependencies\webrtc\include\third_party\libyuv\include;..\dependencies\webrtc\include\third_party\libsrtp\include;..\dependencies\ffmpeg\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\dependencies\webrtc\lib\x64\debug;..\dependencies\ffmpeg\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>swscale.lib;avcodec.lib;avformat.lib;swresample.lib;d3d9.lib;d3d11.lib;dxgi.lib;webrtcd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NOMINMAX;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\dependencies\webrtc\include;..\dependencies\webrtc\include\third_party\opus\src\include;..\dependencies\webrtc\include\third_party\abseil-cpp;..\dependencies\webrtc\include\third_party\jsoncpp\source\include;..\dependencies\webrtc\include\third_party\boringssl\src\include;..\dependencies\webrtc\include\third_party\libyuv\include;..\dependencies\webrtc\include\third_party\libsrtp\include;..\dependencies\ffmpeg\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>swscale.lib;avcodec.lib;avformat.lib;swresample.lib;d3d9.lib;d3d11.lib;dxgi.lib;webrtc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\dependencies\webrtc\lib\x64\release;..\dependencies\ffmpeg\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="avcodec\aac_encoder.cpp" />
+    <ClCompile Include="avcodec\audio_resampler.cpp" />
+    <ClCompile Include="avcodec\h264_encoder.cpp" />
+    <ClCompile Include="avcodec\opus_encoder.cpp" />
+    <ClCompile Include="avcodec\video_converter.cpp" />
+    <ClCompile Include="capture\audio_capture.cpp" />
+    <ClCompile Include="capture\d3d11_screen_capture.cc" />
+    <ClCompile Include="capture\d3d9_screen_capture.cc" />
+    <ClCompile Include="capture\wasapi_capture.cpp" />
+    <ClCompile Include="capture\wasapi_player.cpp" />
+    <ClCompile Include="capture\window_helper.cc" />
+    <ClCompile Include="rtc\dtls_connection.cpp" />
+    <ClCompile Include="rtc\h264_parser.cpp" />
+    <ClCompile Include="rtc\h264_rtp_source.cpp" />
+    <ClCompile Include="rtc\opus_rtp_source.cpp" />
+    <ClCompile Include="rtc\rtc_connection.cpp" />
+    <ClCompile Include="rtc\rtc_raii.cpp" />
+    <ClCompile Include="rtc\rtc_sdp.cpp" />
+    <ClCompile Include="rtc\rtc_server.cpp" />
+    <ClCompile Include="rtc\rtp_source.cpp" />
+    <ClCompile Include="rtc\srtp_session.cpp" />
+    <ClCompile Include="rtc\stun_receiver.cpp" />
+    <ClCompile Include="rtc\stun_sender.cpp" />
+    <ClCompile Include="rtc\udp_connection.cpp" />
+    <ClCompile Include="rtc_live_stream.cpp" />
+    <ClCompile Include="rtc_signaling_handler.cpp" />
+    <ClCompile Include="signaling_server.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="net\Acceptor.cpp" />
+    <ClCompile Include="net\BufferReader.cpp" />
+    <ClCompile Include="net\BufferWriter.cpp" />
+    <ClCompile Include="net\EpollTaskScheduler.cpp" />
+    <ClCompile Include="net\EventLoop.cpp" />
+    <ClCompile Include="net\Logger.cpp" />
+    <ClCompile Include="net\MemoryManager.cpp" />
+    <ClCompile Include="net\NetInterface.cpp" />
+    <ClCompile Include="net\Pipe.cpp" />
+    <ClCompile Include="net\SelectTaskScheduler.cpp" />
+    <ClCompile Include="net\SocketUtil.cpp" />
+    <ClCompile Include="net\TaskScheduler.cpp" />
+    <ClCompile Include="net\TcpConnection.cpp" />
+    <ClCompile Include="net\TcpServer.cpp" />
+    <ClCompile Include="net\TcpSocket.cpp" />
+    <ClCompile Include="net\Timer.cpp" />
+    <ClCompile Include="net\Timestamp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="avcodec\aac_encoder.h" />
+    <ClInclude Include="avcodec\audio_resampler.h" />
+    <ClInclude Include="avcodec\av_common.h" />
+    <ClInclude Include="avcodec\av_encoder.h" />
+    <ClInclude Include="avcodec\h264_encoder.h" />
+    <ClInclude Include="avcodec\opus_encoder.h" />
+    <ClInclude Include="avcodec\video_converter.h" />
+    <ClInclude Include="capture\audio_buffer.h" />
+    <ClInclude Include="capture\audio_capture.h" />
+    <ClInclude Include="capture\d3d11_screen_capture.h" />
+    <ClInclude Include="capture\d3d9_screen_capture.h" />
+    <ClInclude Include="capture\screen_capture.h" />
+    <ClInclude Include="capture\wasapi_capture.h" />
+    <ClInclude Include="capture\wasapi_player.h" />
+    <ClInclude Include="capture\window_helper.h" />
+    <ClInclude Include="http\httplib.h" />
+    <ClInclude Include="rtc\dtls_connection.h" />
+    <ClInclude Include="rtc\h264_parser.h" />
+    <ClInclude Include="rtc\h264_rtp_sender.h" />
+    <ClInclude Include="rtc\h264_rtp_source.h" />
+    <ClInclude Include="rtc\opus_rtp_source.h" />
+    <ClInclude Include="rtc\rtcp.h" />
+    <ClInclude Include="rtc\rtc_common.h" />
+    <ClInclude Include="rtc\rtc_connection.h" />
+    <ClInclude Include="rtc\rtc_log.h" />
+    <ClInclude Include="rtc\rtc_sdp.h" />
+    <ClInclude Include="rtc\rtc_server.h" />
+    <ClInclude Include="rtc\rtc_utils.h" />
+    <ClInclude Include="rtc\rtp.h" />
+    <ClInclude Include="rtc\rtp_source.h" />
+    <ClInclude Include="rtc\srtp_session.h" />
+    <ClInclude Include="rtc\stun.h" />
+    <ClInclude Include="rtc\stun_receiver.h" />
+    <ClInclude Include="rtc\stun_sender.h" />
+    <ClInclude Include="rtc\udp_connection.h" />
+    <ClInclude Include="rtc_live_stream.h" />
+    <ClInclude Include="rtc_signaling_handler.h" />
+    <ClInclude Include="signaling_server.h" />
+    <ClInclude Include="json\json.hpp" />
+    <ClInclude Include="net\Acceptor.h" />
+    <ClInclude Include="net\BufferReader.h" />
+    <ClInclude Include="net\BufferWriter.h" />
+    <ClInclude Include="net\ByteArray.hpp" />
+    <ClInclude Include="net\Channel.h" />
+    <ClInclude Include="net\EpollTaskScheduler.h" />
+    <ClInclude Include="net\EventLoop.h" />
+    <ClInclude Include="net\log.h" />
+    <ClInclude Include="net\Logger.h" />
+    <ClInclude Include="net\MemoryManager.h" />
+    <ClInclude Include="net\NetInterface.h" />
+    <ClInclude Include="net\Pipe.h" />
+    <ClInclude Include="net\RingBuffer.h" />
+    <ClInclude Include="net\SelectTaskScheduler.h" />
+    <ClInclude Include="net\Socket.h" />
+    <ClInclude Include="net\SocketUtil.h" />
+    <ClInclude Include="net\TaskScheduler.h" />
+    <ClInclude Include="net\TcpConnection.h" />
+    <ClInclude Include="net\TcpServer.h" />
+    <ClInclude Include="net\TcpSocket.h" />
+    <ClInclude Include="net\Timer.h" />
+    <ClInclude Include="net\Timestamp.h" />
+    <ClInclude Include="spdlog\spdlog.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

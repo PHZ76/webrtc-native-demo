@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>rtc</title>
+	<style>
+		video {
+			width: 640px;
+			height: 480px;
+			background-color: #000;
+		}
+	</style>
+</head>
+
+<body>
+	<video id="remote_video" controls muted autoplay></video>
+	<br>
+	
+	<br>
+	<label for="id">uid: </label>
+	<input id="input_uid" type="text" name="uid" value={{uid}}>
+	
+	<br>
+	<label for="server_ip">server_ip: </label>
+	<input id="input_ip" type="text" name="server_ip" value={{host}}>
+	<br>
+
+	<button id="play_btn">play</button>
+	<button id="stop_btn">stop</button>
+</body>
+<script src="/adapter.js"></script>
+<script src="/jquery-2.1.1.min.js"></script>
+<script>
+	var remoteVideo = document.getElementById('remote_video');
+	var playBtn = document.getElementById('play_btn');
+	var stopBtn = document.getElementById('stop_btn');
+	var ip = document.getElementById('input_ip').value;
+	var uid = document.getElementById('input_uid').value;
+
+	playBtn.addEventListener('click', startPlay);
+	stopBtn.addEventListener('click', stopPlay);
+	playBtn.disabled = false;
+	stopBtn.disabled = true;
+
+	var offer = "";
+	var pc;
+	const config = {};
+	var remoteStream;
+	var lastConnectionState = "";
+	
+	function startPlay() {
+		console.log("[Play] fetch offer, uid:" + uid);
+		$.post("/api/fetchoffer", {"uid": uid, "stream": "live"},
+			function(data, textStatus) {
+				console.log("[Play] fetch offer response: " + JSON.stringify(data));
+				if ("success" == textStatus && 0 == data.status) {
+					console.log("[Play] fetch offer succeed. \n");
+					offer = data.offer;
+					CreatePeerConnection();
+					playBtn.disabled = true;
+					stopBtn.disabled = false;
+				} else {
+					console.log("[Play] fetch offer failed. \n");
+				}
+			},
+			"json"
+		);
+	}
+	
+	function stopPlay() {
+	    remoteVideo.srcObject = null;
+		if (remoteStream && remoteStream.getAudioTracks()) {
+			remoteStream.getAudioTracks()[0].stop();
+		}
+
+		if (remoteStream && remoteStream.getVideoTracks()) {
+			remoteStream.getVideoTracks()[0].stop();
+		}
+
+		if (pc) {
+			pc.close();
+			pc = null;
+		}
+		playBtn.disabled = false;
+		stopBtn.disabled = true;
+	}
+
+	function CreatePeerConnection() {
+		pc = new RTCPeerConnection(config);
+		pc.oniceconnectionstatechange = function(e) {
+			var state = "";
+			if (lastConnectionState != "") {
+				state = lastConnectionState + "->" + pc.iceConnectionState;
+			} else {
+				state = pc.iceConnectionState;
+			}
+			console.log("ice state: " + state);
+			lastConnectionState = pc.iceConnectionState;
+		}
+		
+		pc.onaddstream = function(e) {
+			remoteStream = e.stream;
+			remoteVideo.srcObject = e.stream;
+		}
+		
+		console.log("set remote sdp ...");
+		const offerData = {
+			type: 'offer',
+			sdp: offer
+		};
+		pc.setRemoteDescription(new RTCSessionDescription(offerData)).then(
+			setRemoteDescriptionSuccess,
+			setRemoteDescriptionError
+		);
+	}
+	
+	function setRemoteDescriptionSuccess() {
+		console.log("pc set remote sdp success");
+		pc.createAnswer().then(
+			createSessionDescriptionSuccess,
+			createSessionDescriptionError               
+		);
+	}
+
+	function createSessionDescriptionSuccess(answer) {
+		console.log("answer sdp: \n" + answer.sdp);
+		console.log("set local sdp");
+		pc.setLocalDescription(answer).then(
+			setLocalDescriptionSuccess,
+			setLocalDescriptionError
+		);
+
+		sendAnswer(answer.sdp);
+	}
+
+	function setLocalDescriptionSuccess() {
+		console.log("set local sdp success");
+	}
+
+	function setRemoteDescriptionError(error) {
+		console.log("set remote sdp error: " + error);
+	}
+
+	function setLocalDescriptionError(error) {
+		console.log("set local sdp error: " + error);
+	}
+
+	function createSessionDescriptionError(error) {
+		console.log("create answer error: " + error);
+	}
+	
+	function sendAnswer(answerSdp) {
+		console.log("[Play] send answer, uid:" + uid);
+		$.post("/api/sendanswer",
+				{"uid": uid, "stream": "live", "answer": answerSdp},
+				function(data, textStatus) {
+					console.log("[Play] send answer response: " + JSON.stringify(data));
+					if ("success" == textStatus && 0 == data.status) {
+						console.log("[Play] send answer succeed. \n");
+					} else {
+						console.log("[Play] send answer failed. \n");
+					}
+				},
+				"json"
+		);
+	}
+
+</script>
+
+</html>

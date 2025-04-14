@@ -2,7 +2,7 @@ $ZIP_PATH = "C:\Program Files\7-Zip\7z.exe"
 
 $SOURCE_DIR = Join-Path (Resolve-Path ".").Path "_download"
 $INSTALL_DIR = Join-Path (Resolve-Path ".").Path "dependencies"
-$RUN_DIR_X64 = Join-Path (Resolve-Path ".").Path "run_env\x64"
+$RUN_DIR_X64 = Join-Path (Resolve-Path ".").Path "run_env"
 
 Remove-Item $SOURCE_DIR -Force -Recurse -ErrorAction Ignore 
 Remove-Item $INSTALL_DIR\webrtc -Force -Recurse -ErrorAction Ignore 
