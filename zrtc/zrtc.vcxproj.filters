@@ -159,12 +159,6 @@
     <ClCompile Include="rtc\srtp_session.cpp">
       <Filter>源文件\rtc</Filter>
     </ClCompile>
-    <ClCompile Include="rtc\stun_receiver.cpp">
-      <Filter>源文件\rtc</Filter>
-    </ClCompile>
-    <ClCompile Include="rtc\stun_sender.cpp">
-      <Filter>源文件\rtc</Filter>
-    </ClCompile>
     <ClCompile Include="rtc\udp_connection.cpp">
       <Filter>源文件\rtc</Filter>
     </ClCompile>
@@ -173,6 +167,18 @@
     </ClCompile>
     <ClCompile Include="rtc_signaling_handler.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="rtc\rtcp_sink.cpp">
+      <Filter>源文件\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="rtc\rtcp_source.cpp">
+      <Filter>源文件\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="rtc\stun_sink.cpp">
+      <Filter>源文件\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="rtc\stun_source.cpp">
+      <Filter>源文件\rtc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -347,12 +353,6 @@
     <ClInclude Include="rtc\stun.h">
       <Filter>源文件\rtc</Filter>
     </ClInclude>
-    <ClInclude Include="rtc\stun_receiver.h">
-      <Filter>源文件\rtc</Filter>
-    </ClInclude>
-    <ClInclude Include="rtc\stun_sender.h">
-      <Filter>源文件\rtc</Filter>
-    </ClInclude>
     <ClInclude Include="rtc\udp_connection.h">
       <Filter>源文件\rtc</Filter>
     </ClInclude>
@@ -361,6 +361,18 @@
     </ClInclude>
     <ClInclude Include="rtc_signaling_handler.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="rtc\rtcp_sink.h">
+      <Filter>源文件\rtc</Filter>
+    </ClInclude>
+    <ClInclude Include="rtc\rtcp_source.h">
+      <Filter>源文件\rtc</Filter>
+    </ClInclude>
+    <ClInclude Include="rtc\stun_sink.h">
+      <Filter>源文件\rtc</Filter>
+    </ClInclude>
+    <ClInclude Include="rtc\stun_source.h">
+      <Filter>源文件\rtc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

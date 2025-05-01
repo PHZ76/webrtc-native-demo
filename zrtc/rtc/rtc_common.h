@@ -28,6 +28,8 @@ static const uint8_t   RTC_H264_FRAME_TYPE_SPS = 7;
 static const uint8_t   RTC_H264_FRAME_TYPE_PPS = 8;
 static const uint8_t   RTC_H264_FRAME_TYPE_REF = 1;
 
+static const uint32_t  RTC_RTCP_UPDATE_INTERVAL = 1000;
+
 enum RtcMediaCodec
 {
 	RTC_MEDIA_CODEC_H264 = 102,

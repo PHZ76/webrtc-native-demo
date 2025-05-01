@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 #define RTCP_HEADER_OPTION_VERSION            0x01
@@ -40,7 +41,7 @@ struct RtcpHeader
 			payload_type = value;
 			break;
 		case RTCP_HEADER_OPTION_LENGTH:
-			length = (value / 4) - 1;
+			length = value;
 			break;
 		default:
 			break;
@@ -57,6 +58,20 @@ struct RtcpHeader
 		return header;
 	}
 };
+
+struct RtcpPacket
+{
+	RtcpPacket()
+		: data(new uint8_t[1500], std::default_delete<uint8_t[]>())
+	{
+		memset(data.get(), 0, 1500);
+	}
+
+	std::shared_ptr<uint8_t> data;
+	uint32_t data_size = 0;
+};
+
+using RtcpPacketPtr = std::shared_ptr<RtcpPacket>;
 
 static bool IsRtcpPacket(const uint8_t* data, size_t size)
 {

@@ -1,4 +1,4 @@
-#include "stun_sender.h"
+#include "stun_source.h"
 #include "rtc_common.h"
 
 #include <openssl/dh.h>
@@ -6,48 +6,48 @@
 #include <openssl/hmac.h>
 #include <openssl/ssl.h>
 
-StunSender::StunSender()
+StunSource::StunSource()
 {
 
 }
 
-StunSender::~StunSender()
+StunSource::~StunSource()
 {
 
 }
 
-void StunSender::SetMessageType(uint16_t message_type)
+void StunSource::SetMessageType(uint16_t message_type)
 {
 	message_type_ = message_type;
 }
 
-void StunSender::SetTransactionId(std::string transaction_id)
+void StunSource::SetTransactionId(std::string transaction_id)
 {
 	transaction_id_ = transaction_id;
 }
 
-void StunSender::SetUserame(std::string username)
+void StunSource::SetUserame(std::string username)
 {
 	// username = remote_ufrag + ":" + local_ufrag;
 	username_ = username;
 }
 
-void StunSender::SetPassword(std::string password)
+void StunSource::SetPassword(std::string password)
 {
 	password_ = password;
 }
 
-void StunSender::SetMappedAddress(uint32_t mapped_addr)
+void StunSource::SetMappedAddress(uint32_t mapped_addr)
 {
 	mapped_addr_ = mapped_addr;
 }
 
-void StunSender::SetMappedPort(uint16_t mapped_port)
+void StunSource::SetMappedPort(uint16_t mapped_port)
 {
 	mapped_port_ = mapped_port;
 }
 
-std::vector<uint8_t> StunSender::Build()
+std::vector<uint8_t> StunSource::Build()
 {
 	buffer_.reset(new ByteArray());
 	message_length_ = 0;
@@ -72,7 +72,7 @@ std::vector<uint8_t> StunSender::Build()
 	return std::vector<uint8_t>(buffer_->Data(), buffer_->Data() + buffer_->Size());
 }
 
-uint16_t StunSender::EncodeUsername()
+uint16_t StunSource::EncodeUsername()
 {
 	if (!buffer_) {
 		return 0;
@@ -93,7 +93,7 @@ uint16_t StunSender::EncodeUsername()
 	return static_cast<uint16_t>(STUN_ATTRIBUTE_HEADER_SIZE + username_.size() + padding_len);
 }
 
-uint16_t StunSender::EncodeMappedAddress()
+uint16_t StunSource::EncodeMappedAddress()
 {
 	if (!buffer_) {
 		return 0;
@@ -110,7 +110,7 @@ uint16_t StunSender::EncodeMappedAddress()
 	return STUN_ATTRIBUTE_HEADER_SIZE + 8;
 }
 
-uint16_t StunSender::EncodeMessageIntegrity()
+uint16_t StunSource::EncodeMessageIntegrity()
 {
 	if (!buffer_) {
 		return 0;
@@ -158,7 +158,7 @@ failed:
 	return 0;
 }
 
-uint16_t StunSender::EncodeFingerprint()
+uint16_t StunSource::EncodeFingerprint()
 {
 	if (!buffer_) {
 		return 0;

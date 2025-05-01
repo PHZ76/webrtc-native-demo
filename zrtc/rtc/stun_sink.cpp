@@ -1,17 +1,17 @@
-#include "stun_receiver.h"
+#include "stun_sink.h"
 #include "rtc_common.h"
 
-StunReceiver::StunReceiver()
+StunSink::StunSink()
 {
 
 }
 
-StunReceiver::~StunReceiver()
+StunSink::~StunSink()
 {
 
 }
 
-bool StunReceiver::Parse(const uint8_t* data, size_t size)
+bool StunSink::Parse(const uint8_t* data, size_t size)
 {
 	if (!IsStunPacket(data, size)) {
 		return false;
@@ -62,17 +62,17 @@ bool StunReceiver::Parse(const uint8_t* data, size_t size)
 	return true;
 }
 
-std::string StunReceiver::GetTransactionId() const
+std::string StunSink::GetTransactionId() const
 {
 	return transaction_id_;
 }
 
-std::string StunReceiver::GetAttrUserName() const
+std::string StunSink::GetAttrUserName() const
 {
 	return username_;
 }
 
-std::string StunReceiver::GetMessageIntegrity() const
+std::string StunSink::GetMessageIntegrity() const
 {
 	return message_integrity_;
 }

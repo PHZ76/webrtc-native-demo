@@ -4,11 +4,11 @@
 #include <unordered_map>
 #include <string>
 
-class StunReceiver
+class StunSink
 {
 public:
-	StunReceiver();
-	virtual ~StunReceiver();
+	StunSink();
+	virtual ~StunSink();
 
 	bool Parse(const uint8_t* data, size_t size);
 

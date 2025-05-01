@@ -20,6 +20,10 @@ public:
 	{ 
 		send_pkt_callback_ = callback; 
 	}
+
+	uint32_t GetTimestamp();
+	uint32_t GetSSRC();
+
 protected:
 	RtpHeader rtp_header_ = {};
 	SendPacketCallback send_pkt_callback_;

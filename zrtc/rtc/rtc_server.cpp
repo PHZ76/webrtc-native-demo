@@ -63,9 +63,6 @@ void RtcServer::OnRequest(std::string stream_name, std::string offer, std::strin
 {
 	std::lock_guard<std::mutex> locker(connections_mutex_);
 
-	// 测试
-	rtc_connections_.clear();
-
 	auto rtc_connection = std::make_shared<RtcConnection>(event_loop_);
 	rtc_connection->SetStreamName(stream_name);
 	rtc_connection->SetLocalAddress(local_ip_, 10000);

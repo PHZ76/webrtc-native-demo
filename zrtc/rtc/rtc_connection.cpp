@@ -45,6 +45,9 @@ bool RtcConnection::Init(RtcRole role)
 	dtls_connection_ = std::make_shared<DtlsConnection>();
 	dtls_connection_->Init(role_);
 
+	stun_source_ = std::make_shared<StunSource>();
+	stun_sink_ = std::make_shared<StunSink>();
+
 	local_sdp_.SetAddress(local_ip_, local_port_);
 	local_sdp_.SetIceParams(ice_ufrag_, ice_pwd_);
 	local_sdp_.SetFingerprint(dtls_connection_->GetFingerprint());
@@ -52,6 +55,8 @@ bool RtcConnection::Init(RtcRole role)
 
 	local_sdp_.SetAudioSsrc(audio_ssrc_);
 	local_sdp_.SetAudioPayloadType(RTC_MEDIA_CODEC_OPUS);
+	rtcp_sources_[audio_ssrc_] = std::make_shared<RtcpSource>(audio_ssrc_);
+	rtcp_sources_[audio_ssrc_]->SetSenderReportInterval(5000);
 	rtp_sources_[audio_ssrc_] = std::make_shared<OpusRtpSource>(audio_ssrc_, RTC_MEDIA_CODEC_OPUS);
 	rtp_sources_[audio_ssrc_]->SetSendPacketCallback([this](std::list<RtpPacketPtr> rtp_pkts) {
 		OnSendRtpPackets(rtp_pkts);
@@ -59,16 +64,24 @@ bool RtcConnection::Init(RtcRole role)
 
 	local_sdp_.SetVideoSsrc(video_ssrc_);
 	local_sdp_.SetVideoPayloadType(RTC_MEDIA_CODEC_H264);
+	rtcp_sources_[video_ssrc_] = std::make_shared<RtcpSource>(video_ssrc_);
+	rtcp_sources_[video_ssrc_]->SetSenderReportInterval(1000);
 	rtp_sources_[video_ssrc_] = std::make_shared<H264RtpSource>(video_ssrc_, RTC_MEDIA_CODEC_H264);
 	rtp_sources_[video_ssrc_]->SetSendPacketCallback([this](std::list<RtpPacketPtr> rtp_pkts) {
 		OnSendRtpPackets(rtp_pkts);
 	});
+
+	check_rtcp_timer_id_ = event_loop_->AddTimer([this]() {
+		CheckSendRtcp();
+		return true;
+	}, 1000);
 
 	return true;
 }
 
 void RtcConnection::Destroy()
 {
+	event_loop_->RemoveTimer(check_rtcp_timer_id_);
 	UdpConnection::Destroy();
 	is_handshake_done_ = false;
 	rtp_sources_.clear();
@@ -156,9 +169,36 @@ void RtcConnection::OnSendRtpPackets(std::list<RtpPacketPtr> rtp_pkts)
 		for (auto pkt : rtp_pkts) {
 			if (pkt) {
 				int rtp_pkt_size = srtp_session_->ProtectRtp(pkt->data.get(), pkt->data_size);
-				//RTC_LOG_INFO("ProtectRtp:{} ==> {}", pkt->data_size, rtp_pkt_size);
 				if (rtp_pkt_size > 0) {
 					OnSend(pkt->data.get(), rtp_pkt_size);
+				}
+				else {
+					break;
+				}
+				if (rtcp_sources_.count(pkt->ssrc)) {
+					auto rtcp_source = rtcp_sources_[pkt->ssrc];
+					rtcp_source->OnSendRtp(pkt->data_size, pkt->timestamp);
+				}
+			}
+		}
+	});
+}
+
+void RtcConnection::OnSendRtcpPackets(std::list<RtcpPacketPtr> rtcp_pkts)
+{
+	event_loop_->AddTriggerEvent([this, rtcp_pkts] {
+		if (!is_handshake_done_) {
+			return;
+		}
+
+		for (auto pkt : rtcp_pkts) {
+			if (pkt) {
+				int rtcp_pkt_size = srtp_session_->ProtectRtcp(pkt->data.get(), pkt->data_size);
+				if (rtcp_pkt_size > 0) {
+					OnSend(pkt->data.get(), rtcp_pkt_size);
+				}
+				else {
+					break;
 				}
 			}
 		}
@@ -167,15 +207,19 @@ void RtcConnection::OnSendRtpPackets(std::list<RtpPacketPtr> rtp_pkts)
 
 void RtcConnection::OnStunPacket(uint8_t* stun_pkt, size_t size)
 {
-	bool result = stun_receiver_.Parse(stun_pkt, size);
+	if (!stun_source_ || !stun_sink_) {
+		return;
+	}
+
+	bool result = stun_sink_->Parse(stun_pkt, size);
 	if (result) {
-		stun_sender_.SetMessageType(STUN_BINDING_RESPONSE);
-		stun_sender_.SetTransactionId(stun_receiver_.GetTransactionId());
-		stun_sender_.SetUserame(remote_sdp_.GetIceUfrag() + ":" + ice_ufrag_);
-		stun_sender_.SetPassword(ice_pwd_);
-		stun_sender_.SetMappedAddress(ntohl(peer_addr_.sin_addr.s_addr));
-		stun_sender_.SetMappedPort(ntohs(peer_addr_.sin_port));
-		auto stun_response = stun_sender_.Build();
+		stun_source_->SetMessageType(STUN_BINDING_RESPONSE);
+		stun_source_->SetTransactionId(stun_sink_->GetTransactionId());
+		stun_source_->SetUserame(remote_sdp_.GetIceUfrag() + ":" + ice_ufrag_);
+		stun_source_->SetPassword(ice_pwd_);
+		stun_source_->SetMappedAddress(ntohl(peer_addr_.sin_addr.s_addr));
+		stun_source_->SetMappedPort(ntohs(peer_addr_.sin_port));
+		auto stun_response = stun_source_->Build();
 		OnSend(stun_response.data(), stun_response.size());
 	}
 }
@@ -214,12 +258,28 @@ void RtcConnection::OnDtlsPacket(uint8_t* dtls_pkt, size_t size)
 
 void RtcConnection::OnRtpPacket(uint8_t* pkt, size_t size)
 {
-	//RTC_LOG_INFO("recv rtp:{}", size);
+	//RTC_LOG_INFO("recv rtp, size:{}", size);
 }
 
 void RtcConnection::OnRtcpPacket(uint8_t* pkt, size_t size)
 {
-	//RTC_LOG_INFO("recv rtcp:{}", size);
 	int rtcp_pkt_size = srtp_session_->UnprotectRtcp(pkt, (int)size);
-	//RTC_LOG_INFO("unprotect rtcp:{}", rtcp_pkt_size);
+}
+
+void RtcConnection::CheckSendRtcp()
+{
+	std::list<RtcpPacketPtr> rtcp_pkts;
+	uint64_t ntp_timestamp = GetNtpTimestamp();
+	
+	for (auto rtcp_source : rtcp_sources_) {
+		rtcp_source.second->SetNtpTimestamp(ntp_timestamp);
+		auto rtcp_packet = rtcp_source.second->BuildSR();
+		if (rtcp_packet) {
+			rtcp_pkts.push_back(rtcp_packet);
+		}
+	}
+
+	if (!rtcp_pkts.empty()) {
+		OnSendRtcpPackets(rtcp_pkts);
+	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 static const uint32_t RTP_HEADER_SIZE = 12;
 static const uint8_t  RTP_VERSION = 2;
@@ -27,6 +28,8 @@ struct RtpPacket
 	}
 
 	std::shared_ptr<uint8_t> data;
+	uint32_t ssrc = 0;
+	uint32_t timestamp = 0;
 	uint32_t data_size  = 0;
 	uint8_t  frame_type = 0;
 };

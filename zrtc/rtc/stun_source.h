@@ -3,11 +3,11 @@
 #include "stun.h"
 #include "rtc_utils.h"
 
-class StunSender
+class StunSource
 {
 public:
-	StunSender();
-	virtual ~StunSender();
+	StunSource();
+	virtual ~StunSource();
 
 	void SetMessageType(uint16_t message_type);
 	void SetTransactionId(std::string transaction_id);
