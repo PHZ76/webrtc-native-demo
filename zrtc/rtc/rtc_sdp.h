@@ -24,7 +24,7 @@ public:
 	void SetStreamName(std::string stream_name);
 	void SetVideoSsrc(uint32_t ssrc);
 	void SetAudioSsrc(uint32_t ssrc);
-	void SetVideoPayloadType(uint32_t payload_type);
+	void SetVideoPayloadType(uint32_t payload_type, uint32_t rtx_payload_type);
 	void SetAudioPayloadType(uint32_t payload_type);
 
 	std::string GetIceUfrag();
@@ -40,7 +40,7 @@ private:
 	uint32_t video_ssrc_ = 20000;
 	uint32_t audio_payload_type_ = 111;
 	uint32_t video_payload_type_ = 125;
-
+	uint32_t rtx_payload_type_ = 120;
 	uint16_t port_ = 10000;
 	std::string ip_ = "127.0.0.1";
 };

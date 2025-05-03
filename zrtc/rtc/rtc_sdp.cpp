@@ -93,7 +93,7 @@ std::string RtcSdp::Build()
     ss << "a=ssrc:" << audio_ssrc_ << " label:" << stream_name_ << "_audio\n";
     ss << "a=candidate:0 1 UDP 2130706431 " << ip_ << " " << port_ << " typ host generation 0\n";
 
-    ss << "m=video 9 UDP/TLS/RTP/SAVPF " << video_payload_type_ << "\n";
+    ss << "m=video 9 UDP/TLS/RTP/SAVPF " << video_payload_type_ << " " << rtx_payload_type_ << "\n";
     ss << "a=rtpmap:" << video_payload_type_ << " H264/90000\n";
     ss << "c=IN IP4 0.0.0.0\n";
     ss << "a=ice-ufrag:" << ice_ufrag_ << "\n";
@@ -110,8 +110,12 @@ std::string RtcSdp::Build()
     ss << "a=rtcp-fb:" << video_payload_type_ << " transport-cc\n";
     ss << "a=rtcp-fb:" << video_payload_type_ << " nack\n";
     ss << "a=rtcp-fb:" << video_payload_type_ << " nack pli\n";
-    ss << "a=fmtp:" << video_payload_type_ << " level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f\r\n";
+    ss << "a=fmtp:" << video_payload_type_ << " level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f\n";
     //ss << "a=fmtp:" << video_payload_type_ << " packetization-mode=1;profile-level-id=42e01f\r\n";
+
+    ss << "a=rtpmap:" << rtx_payload_type_ << " rtx/90000\n";
+    ss << "a=fmtp:" << rtx_payload_type_ << " apt=" << video_payload_type_ << "\n";
+
     ss << "a=ssrc:" << video_ssrc_ << " cname:" << stream_name_ << "\n";
     ss << "a=ssrc:" << video_ssrc_ << " label:" << stream_name_ << "_video\n";
     ss << "a=candidate:0 1 UDP 2130706431 " << ip_ << " " << port_ << " typ host generation 0\n";
@@ -151,9 +155,10 @@ void RtcSdp::SetAudioSsrc(uint32_t ssrc)
     audio_ssrc_ = ssrc;
 }
 
-void RtcSdp::SetVideoPayloadType(uint32_t payload_type)
+void RtcSdp::SetVideoPayloadType(uint32_t payload_type, uint32_t rtx_payload_type)
 {
     video_payload_type_ = payload_type;
+    rtx_payload_type_ = rtx_payload_type;
 }
 
 void RtcSdp::SetAudioPayloadType(uint32_t payload_type)

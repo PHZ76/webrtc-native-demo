@@ -2,6 +2,7 @@
 
 #include "rtcp.h"
 #include <map>
+#include <vector>
 
 struct ReportBlock
 {
@@ -20,9 +21,11 @@ public:
 	RtcpSink();
 	virtual ~RtcpSink();
 
+	bool Parse(uint8_t* pkt, size_t size);
+
 	void OnSenderReportRecord(uint32_t last_sr);
 
-	bool Parse(uint8_t* pkt, size_t size);
+	void GetLostSeq(uint32_t ssrc, std::vector<uint16_t> lost_seqs);
 
 private:
 	void OnReceiverReport(uint8_t* payload, size_t size);
@@ -30,4 +33,5 @@ private:
 
 	RtcpHeader rtcp_header_;
 	std::map<uint32_t, uint64_t> last_sr_records_;
+	std::map<uint32_t, std::vector<uint16_t>> nack_lost_seqs_;
 };

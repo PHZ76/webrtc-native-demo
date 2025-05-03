@@ -61,20 +61,20 @@ void TimerQueue::HandleTimerEvent()
 {
 	if(!timers_.empty()) {
 		std::lock_guard<std::mutex> locker(mutex_);
-		int64_t timePoint = GetTimeNow();
-		while(!timers_.empty() && events_.begin()->first.first<=timePoint)
+		int64_t time_point = GetTimeNow();
+		while(!timers_.empty() && events_.begin()->first.first <= time_point)
 		{	
-			TimerId timerId = events_.begin()->first.second;
+			TimerId timer_id = events_.begin()->first.second;
 			bool flag = events_.begin()->second->event_callback_();
 			if(flag == true) {
-				events_.begin()->second->SetNextTimeout(timePoint);
-				auto timerPtr = std::move(events_.begin()->second);
+				events_.begin()->second->SetNextTimeout(time_point);
+				auto timer = std::move(events_.begin()->second);
 				events_.erase(events_.begin());
-				events_.emplace(std::pair<int64_t, TimerId>(timerPtr->getNextTimeout(), timerId), timerPtr);
+				events_.emplace(std::pair<int64_t, TimerId>(timer->getNextTimeout(), timer_id), timer);
 			}
 			else {		
 				events_.erase(events_.begin());
-				timers_.erase(timerId);				
+				timers_.erase(timer_id);
 			}
 		}	
 	}

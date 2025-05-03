@@ -2,6 +2,7 @@
 
 #include "rtc_common.h"
 #include <chrono>
+#include <vector>
 
 class RtpSource
 {
@@ -11,23 +12,21 @@ public:
 	RtpSource(uint32_t ssrc, uint8_t payload_type);
 	virtual ~RtpSource();
 
-	void SetTimestamp(uint32_t timestamp);
-	void SetMarker(uint8_t marker);
-	void SetSequence(uint32_t sequence);
-	void BuildHeader(std::shared_ptr<RtpPacket> rtp_pkt);
-
-	void SetSendPacketCallback(const SendPacketCallback& callback)
-	{ 
-		send_pkt_callback_ = callback; 
-	}
-
-	uint32_t GetTimestamp();
-	uint32_t GetSSRC();
+	virtual void SetRtx(uint32_t ssrc, uint8_t payload_type);
+	virtual void SetTimestamp(uint32_t timestamp);
+	virtual void SetMarker(uint8_t marker);
+	virtual void SetSequence(uint32_t sequence);
+	virtual void BuildHeader(std::shared_ptr<RtpPacket> rtp_pkt);
+	virtual void RetransmitRtpPackets(std::vector<uint16_t>& lost_seqs);
+	virtual void SetSendPacketCallback(const SendPacketCallback& callback);
+	virtual uint32_t GetTimestamp();
+	virtual uint32_t GetSSRC();
 
 protected:
 	RtpHeader rtp_header_ = {};
 	SendPacketCallback send_pkt_callback_;
-
+	uint32_t rtx_ssrc_ = 0;
+	uint32_t rtx_payloa_type_ = 0;
 	uint16_t sequence_ = 1;
 	uint32_t clock_rate_ = 0;
 };

@@ -179,3 +179,10 @@ void H264RtpSource::BuildRtpFUA(uint8_t* frame_data, size_t frame_size, std::lis
         rtp_pkts.push_back(rtp_pkt);
     }
 }
+
+void H264RtpSource::RetransmitRtpPackets(std::vector<uint16_t>& lost_seqs)
+{
+    if (rtx_ssrc_ == 0) {
+        return;
+    }
+}

@@ -34,6 +34,8 @@ enum RtcMediaCodec
 {
 	RTC_MEDIA_CODEC_H264 = 102,
 	RTC_MEDIA_CODEC_OPUS = 111,
+
+	RTC_MEDIA_CODEC_RTX  = 120,
 };
 
 enum RtcRole

@@ -10,6 +10,7 @@ public:
 	virtual ~H264RtpSource();
 
 	void InputFrame(uint8_t* frame_data, size_t frame_size);
+	virtual void RetransmitRtpPackets(std::vector<uint16_t>& lost_seqs);
 
 private:
 	void HandleSPSFrame(uint8_t* frame_data, size_t frame_size);

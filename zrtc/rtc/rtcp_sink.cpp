@@ -20,11 +20,19 @@ void RtcpSink::OnSenderReportRecord(uint32_t last_sr)
     }
 }
 
+void RtcpSink::GetLostSeq(uint32_t ssrc, std::vector<uint16_t> lost_seqs)
+{
+    if (nack_lost_seqs_.count(ssrc)) {
+        lost_seqs.swap(nack_lost_seqs_[ssrc]);
+        nack_lost_seqs_.erase(ssrc);
+    }
+}
+
 bool RtcpSink::Parse(uint8_t* pkt, size_t size)
 {
-	if (size < RTCP_HEADER_SIZE) {
-		return false;
-	}
+    if (size < RTCP_HEADER_SIZE) {
+	    return false;
+    }
 
     rtcp_header_.version = pkt[0] >> 6;
     rtcp_header_.padding = (pkt[0] & 0x20) ? 1 : 0;
@@ -59,7 +67,7 @@ void RtcpSink::OnReceiverReport(uint8_t* payload, size_t size)
     uint64_t now_time = GetSysTimestamp();
     uint32_t sender_ssrc = ReadU32BE(payload, size);
 
-    for (int index = sizeof(sender_ssrc); index < size; index += RTCP_BLOCK_SIZE) {
+    for (int index = 4; index < size; index += RTCP_BLOCK_SIZE) {
         ReportBlock report_block;
         report_block.ssrc = ReadU32BE(payload + index, size);
         report_block.fraction_lost = payload[index + 4];
@@ -80,5 +88,22 @@ void RtcpSink::OnReceiverReport(uint8_t* payload, size_t size)
 
 void RtcpSink::OnRtpFeedback(uint8_t* payload, size_t size)
 {
+    uint32_t sender_ssrc = ReadU32BE(payload, size);
+    uint32_t media_ssrc = ReadU32BE(payload + 4, size);
 
+    for (int index = 8; index < size; index += 4) {
+        uint16_t nack_pid = ReadU16BE(payload + index, size);
+        uint16_t nack_blp = ReadU16BE(payload + index + 2, size);
+
+        std::vector<uint16_t> lost_seqs;
+        lost_seqs.push_back(nack_pid);
+
+        for (int i = 0; i < 16; ++i) {
+            if (nack_blp & (1 << (15 - i))) {
+                lost_seqs.push_back(nack_pid + 1 + i);
+            }
+        }
+
+        nack_lost_seqs_.emplace(media_ssrc, lost_seqs);
+    }
 }

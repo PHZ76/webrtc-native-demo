@@ -12,8 +12,9 @@ RtcConnection::RtcConnection(std::shared_ptr<xop::EventLoop> event_loop)
 
 	video_ssrc_ = GenerateSSRC();
 	audio_ssrc_ = GenerateSSRC();
+	rtx_ssrc_ = GenerateSSRC();
 
-	RTC_LOG_INFO("create peer connection, video_ssrc:{} audio_ssrc:{}", video_ssrc_, audio_ssrc_);
+	RTC_LOG_INFO("create peer connection, video_ssrc:{} audio_ssrc:{} video_rtx_ssrc:{}", video_ssrc_, audio_ssrc_, rtx_ssrc_);
 }
 
 RtcConnection::~RtcConnection()
@@ -63,10 +64,11 @@ bool RtcConnection::Init(RtcRole role)
 	});
 
 	local_sdp_.SetVideoSsrc(video_ssrc_);
-	local_sdp_.SetVideoPayloadType(RTC_MEDIA_CODEC_H264);
+	local_sdp_.SetVideoPayloadType(RTC_MEDIA_CODEC_H264, RTC_MEDIA_CODEC_RTX);
 	rtcp_sources_[video_ssrc_] = std::make_shared<RtcpSource>(video_ssrc_);
 	rtcp_sources_[video_ssrc_]->SetSenderReportInterval(1000);
 	rtp_sources_[video_ssrc_] = std::make_shared<H264RtpSource>(video_ssrc_, RTC_MEDIA_CODEC_H264);
+	rtp_sources_[video_ssrc_]->SetRtx(rtx_ssrc_, RTC_MEDIA_CODEC_RTX);
 	rtp_sources_[video_ssrc_]->SetSendPacketCallback([this](std::list<RtpPacketPtr> rtp_pkts) {
 		OnSendRtpPackets(rtp_pkts);
 	});
@@ -78,13 +80,20 @@ bool RtcConnection::Init(RtcRole role)
 		return true;
 	}, 1000);
 
+	check_nack_timer_id_ = event_loop_->AddTimer([this]() {
+		CheckNack();
+		return true;
+	}, 5);
+
 	return true;
 }
 
 void RtcConnection::Destroy()
 {
 	event_loop_->RemoveTimer(check_rtcp_timer_id_);
+	event_loop_->RemoveTimer(check_nack_timer_id_);
 	check_rtcp_timer_id_ = 0;
+	check_nack_timer_id_ = 0;
 
 	is_handshake_done_ = false;
 	dtls_connection_->Destroy();
@@ -296,5 +305,16 @@ void RtcConnection::CheckSendRtcp()
 	if (!rtcp_pkts.empty()) {
 		rtcp_sink_->OnSenderReportRecord(ComPactNtp(ntp_timestamp));
 		OnSendRtcpPackets(rtcp_pkts);
+	}
+}
+
+void RtcConnection::CheckNack()
+{
+	for (auto rtp_source : rtp_sources_) {
+		std::vector<uint16_t> lost_seqs;
+		rtcp_sink_->GetLostSeq(rtp_source.first, lost_seqs);
+		if (!lost_seqs.empty()) {
+			rtp_source.second->RetransmitRtpPackets(lost_seqs);
+		}
 	}
 }

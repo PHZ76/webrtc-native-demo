@@ -12,6 +12,12 @@ RtpSource::~RtpSource()
 
 }
 
+void RtpSource::SetRtx(uint32_t ssrc, uint8_t payload_type)
+{
+	rtx_ssrc_ = ssrc;
+	rtx_payloa_type_ = payload_type;
+}
+
 void RtpSource::SetTimestamp(uint32_t timestamp)
 {
 	rtp_header_.timestamp = timestamp;
@@ -27,6 +33,10 @@ void RtpSource::SetSequence(uint32_t sequence)
 	rtp_header_.sequence = sequence;
 }
 
+void RtpSource::SetSendPacketCallback(const SendPacketCallback& callback)
+{
+	send_pkt_callback_ = callback;
+}
 
 uint32_t RtpSource::GetTimestamp()
 {
@@ -52,4 +62,10 @@ void RtpSource::BuildHeader(std::shared_ptr<RtpPacket> rtp_pkt)
 
 	rtp_pkt->ssrc = rtp_header_.ssrc;
 	rtp_pkt->timestamp = rtp_header_.timestamp;
+}
+
+
+void RtpSource::RetransmitRtpPackets(std::vector<uint16_t>& lost_seqs)
+{
+
 }
