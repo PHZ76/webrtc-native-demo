@@ -45,7 +45,7 @@ private:
 	uint32_t video_ssrc_ = 0;
 	std::unordered_map<uint32_t, std::shared_ptr<RtpSource>> rtp_sources_;
 	std::unordered_map<uint32_t, std::shared_ptr<RtcpSource>> rtcp_sources_;
-	std::unordered_map<uint32_t, std::shared_ptr<RtcpSink>> rtcp_sinks_;
+	std::shared_ptr<RtcpSink> rtcp_sink_;
 
 	std::string stream_name_;
 	std::string ice_ufrag_;

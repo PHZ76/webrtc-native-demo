@@ -71,6 +71,8 @@ bool RtcConnection::Init(RtcRole role)
 		OnSendRtpPackets(rtp_pkts);
 	});
 
+	rtcp_sink_ = std::make_shared<RtcpSink>();
+
 	check_rtcp_timer_id_ = event_loop_->AddTimer([this]() {
 		CheckSendRtcp();
 		return true;
@@ -82,10 +84,16 @@ bool RtcConnection::Init(RtcRole role)
 void RtcConnection::Destroy()
 {
 	event_loop_->RemoveTimer(check_rtcp_timer_id_);
-	UdpConnection::Destroy();
+	check_rtcp_timer_id_ = 0;
+
 	is_handshake_done_ = false;
-	rtp_sources_.clear();
 	dtls_connection_->Destroy();
+
+	rtp_sources_.clear();
+	rtcp_sources_.clear();
+	rtcp_sink_ = nullptr;
+
+	UdpConnection::Destroy();
 }
 
 bool RtcConnection::SendVideoFrame(uint8_t* frame, size_t frame_size)
@@ -263,23 +271,30 @@ void RtcConnection::OnRtpPacket(uint8_t* pkt, size_t size)
 
 void RtcConnection::OnRtcpPacket(uint8_t* pkt, size_t size)
 {
+	if (!srtp_session_) {
+		return;
+	}
+
 	int rtcp_pkt_size = srtp_session_->UnprotectRtcp(pkt, (int)size);
+	if (rtcp_pkt_size > 0 && rtcp_sink_) {
+		rtcp_sink_->Parse(pkt, rtcp_pkt_size);
+	}
 }
 
 void RtcConnection::CheckSendRtcp()
 {
 	std::list<RtcpPacketPtr> rtcp_pkts;
-	uint64_t ntp_timestamp = GetNtpTimestamp();
+	NtpTimestamp ntp_timestamp = GetNtpTimestamp();
 	
 	for (auto rtcp_source : rtcp_sources_) {
-		rtcp_source.second->SetNtpTimestamp(ntp_timestamp);
-		auto rtcp_packet = rtcp_source.second->BuildSR();
+		rtcp_source.second->SetNtpTimestamp(ntp_timestamp.seconds, ntp_timestamp.fractions);
+		auto rtcp_packet = rtcp_source.second->BuildSenderReport();
 		if (rtcp_packet) {
 			rtcp_pkts.push_back(rtcp_packet);
 		}
 	}
-
 	if (!rtcp_pkts.empty()) {
+		rtcp_sink_->OnSenderReportRecord(ComPactNtp(ntp_timestamp));
 		OnSendRtcpPackets(rtcp_pkts);
 	}
 }

@@ -5,16 +5,18 @@
 #include <memory>
 #include <vector>
 
-#define RTCP_HEADER_OPTION_VERSION            0x01
-#define RTCP_HEADER_OPTION_PADDING            0x02
-#define RTCP_HEADER_OPTION_RC                 0x03
-#define RTCP_HEADER_OPTION_PAYLOAD_TYPE       0x04
-#define RTCP_HEADER_OPTION_LENGTH             0x05
+#define RTCP_VERSION 2
 
 #define RTCP_HEADER_SIZE 4
 
-#define RTCP_SENDER_REPORT_PT    200
-#define RTCP_SENDER_REPORT_SIZE  28
+#define RTCP_PT_SENDER_REPORT     200
+#define RTCP_PT_RECEIVER_REPORT   201
+#define RTCP_PT_RTP_FEEDBACK      205
+
+#define RTCP_RC_RTP_FEEDBACK      1
+
+#define RTCP_SENDER_REPORT_SIZE   28
+#define RTCP_BLOCK_SIZE           24
 
 struct RtcpHeader
 {
@@ -23,30 +25,6 @@ struct RtcpHeader
 	uint8_t  rc           : 5;
 	uint8_t  payload_type;
 	uint16_t length ;
-
-	void SetOption(int opt, int value)
-	{
-		switch (opt)
-		{
-		case RTCP_HEADER_OPTION_VERSION:
-			version = value;
-			break;
-		case RTCP_HEADER_OPTION_PADDING:
-			padding = value ? 1 : 0;
-			break;
-		case RTCP_HEADER_OPTION_RC:
-			rc = value;
-			break;
-		case RTCP_HEADER_OPTION_PAYLOAD_TYPE:
-			payload_type = value;
-			break;
-		case RTCP_HEADER_OPTION_LENGTH:
-			length = value;
-			break;
-		default:
-			break;
-		}
-	}
 
 	std::vector<uint8_t> Build()
 	{

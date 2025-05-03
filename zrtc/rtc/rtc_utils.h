@@ -76,29 +76,26 @@ static uint64_t GetSysTimestamp()
     return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 }
 
-static uint64_t GetNtpTimestamp()
+struct NtpTimestamp 
 {
-    uint64_t ntp_time = 0;
+    uint32_t seconds;
+    uint32_t fractions;
+};
 
-#if defined(_WIN32) || defined(_WIN64)
-    FILETIME ft;
-    GetSystemTimeAsFileTime(&ft);
+static NtpTimestamp GetNtpTimestamp()
+{
+    auto now = std::chrono::system_clock::now();
+    auto dur = now.time_since_epoch();
+    auto secs = std::chrono::duration_cast<std::chrono::seconds>(dur).count();
+    auto frac = std::chrono::duration_cast<std::chrono::nanoseconds>(dur - std::chrono::seconds(secs)).count();
 
-    ULARGE_INTEGER uli;
-    uli.LowPart = ft.dwLowDateTime;
-    uli.HighPart = ft.dwHighDateTime;
-    const uint64_t epoch_diff = 116444736000000000ULL;
-    uint64_t unix_time_100ns = uli.QuadPart - epoch_diff;
-    uint64_t seconds = unix_time_100ns / 10000000ULL;
-    uint64_t fraction = (unix_time_100ns % 10000000ULL) * 4294967296ULL / 10000000ULL;
-    ntp_time = (seconds + 2208988800ULL) << 32;
-    ntp_time |= fraction;
-#else
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    uint64_t seconds = tv.tv_sec + 2208988800ULL;
-    uint64_t fraction = tv.tv_usec * 4294967296ULL / 1000000ULL;
-    ntp_time = (seconds << 32) | fraction;
-#endif
-    return ntp_time;
+    NtpTimestamp ntp;
+    ntp.seconds = static_cast<uint32_t>(secs + 2208988800ULL);
+    ntp.fractions = static_cast<uint32_t>(frac * (1ULL << 32) / 1000000000);
+    return ntp;
+}
+
+static uint32_t ComPactNtp(NtpTimestamp ntp_timestamp)
+{
+    return (ntp_timestamp.seconds) << 16 | (ntp_timestamp.fractions >> 16);
 }

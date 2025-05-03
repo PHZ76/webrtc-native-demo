@@ -22,11 +22,10 @@ void RtcpSource::SetRtpTimestamp(uint32_t timestamp)
 	rtp_timestamp_ = timestamp;
 }
 
-void RtcpSource::SetNtpTimestamp(uint64_t timestamp)
+void RtcpSource::SetNtpTimestamp(uint32_t seconds, uint32_t fraction)
 {
-	ntp_timestamp_ = timestamp;
-	ntp_mword_ = static_cast<uint32_t>(ntp_timestamp_ >> 32);
-	ntp_lword_ = static_cast<uint32_t>(ntp_timestamp_ & 0xffffffff);
+	ntp_mword_ = seconds;
+	ntp_lword_ = fraction;
 }
 
 void RtcpSource::OnSendRtp(uint32_t rtp_packet_size, uint32_t timestamp)
@@ -36,7 +35,7 @@ void RtcpSource::OnSendRtp(uint32_t rtp_packet_size, uint32_t timestamp)
 	rtp_timestamp_ = timestamp;
 }
 
-RtcpPacketPtr RtcpSource::BuildSR()
+RtcpPacketPtr RtcpSource::BuildSenderReport()
 {
 	if (!CheckSendSR()) {
 		return nullptr;
@@ -44,11 +43,11 @@ RtcpPacketPtr RtcpSource::BuildSR()
 
 	auto rtcp_packet = std::make_shared<RtcpPacket>();
 	RtcpHeader rtcp_header;
-	rtcp_header.SetOption(RTCP_HEADER_OPTION_VERSION, 2);
-	rtcp_header.SetOption(RTCP_HEADER_OPTION_PADDING, 0);
-	rtcp_header.SetOption(RTCP_HEADER_OPTION_RC, 0);
-	rtcp_header.SetOption(RTCP_HEADER_OPTION_PAYLOAD_TYPE, RTCP_SENDER_REPORT_PT);
-	rtcp_header.SetOption(RTCP_HEADER_OPTION_LENGTH, (RTCP_SENDER_REPORT_SIZE - RTCP_HEADER_SIZE) / 4);
+	rtcp_header.version = RTCP_VERSION;
+	rtcp_header.padding = 0;
+	rtcp_header.rc = 0;
+	rtcp_header.payload_type = RTCP_PT_SENDER_REPORT;
+	rtcp_header.length = (RTCP_SENDER_REPORT_SIZE - RTCP_HEADER_SIZE) / 4;
 	std::vector<uint8_t> header = rtcp_header.Build();
 	std::copy(header.begin(), header.end(), rtcp_packet->data.get());
 

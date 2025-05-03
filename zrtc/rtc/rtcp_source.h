@@ -10,10 +10,10 @@ public:
 
 	void SetSenderReportInterval(uint64_t sr_interval);
 	void SetRtpTimestamp(uint32_t timestamp);
-	void SetNtpTimestamp(uint64_t timestamp);
+	void SetNtpTimestamp(uint32_t seconds, uint32_t fraction);
 	void OnSendRtp(uint32_t rtp_packet_size, uint32_t timestamp);
 
-	RtcpPacketPtr BuildSR();
+	RtcpPacketPtr BuildSenderReport();
 
 private:
 	bool CheckSendSR();
@@ -22,7 +22,6 @@ private:
 	uint64_t sr_interval_ = 0;
 	uint64_t last_build_sr_time_ = 0;
 	uint32_t rtp_timestamp_ = 0;
-	uint64_t ntp_timestamp_ = 0;
 	uint32_t ntp_mword_ = 0;
 	uint32_t ntp_lword_ = 0;
 	uint32_t rtp_packet_count_ = 0;
