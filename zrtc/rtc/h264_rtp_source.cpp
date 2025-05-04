@@ -79,6 +79,7 @@ void H264RtpSource::HandleIDRFrame(uint8_t* frame_data, size_t frame_size)
     }
 
     if (rtp_pkts.size() > 0 && send_pkt_callback_) {
+        UpdateRtpCache(rtp_pkts);
         send_pkt_callback_(rtp_pkts);
     }
 }
@@ -98,6 +99,7 @@ void H264RtpSource::HandleRefFrame(uint8_t* frame_data, size_t frame_size)
     }
 
     if (rtp_pkts.size() > 0 && send_pkt_callback_) {
+        UpdateRtpCache(rtp_pkts);
         send_pkt_callback_(rtp_pkts);
     }
 }
@@ -145,7 +147,7 @@ void H264RtpSource::BuildRtpFUA(uint8_t* frame_data, size_t frame_size, std::lis
 
     uint8_t fu_a_size = 2;
     uint8_t fu_a[2] = { 0 };
-    fu_a[0] = (frame_data[0] & 0xE0) | 28;
+    fu_a[0] = (frame_data[0] & 0xe0) | 28;
     fu_a[1] = 0x80 | (frame_data[0] & 0x1f);
     frame_data += 1;
     frame_size -= 1;
@@ -177,12 +179,5 @@ void H264RtpSource::BuildRtpFUA(uint8_t* frame_data, size_t frame_size, std::lis
         memcpy(rtp_pkt->data.get() + RTP_HEADER_SIZE + fu_a_size, frame_data, frame_size);
         rtp_pkt->data_size = RTP_HEADER_SIZE + fu_a_size + static_cast<uint32_t>(frame_size);
         rtp_pkts.push_back(rtp_pkt);
-    }
-}
-
-void H264RtpSource::RetransmitRtpPackets(std::vector<uint16_t>& lost_seqs)
-{
-    if (rtx_ssrc_ == 0) {
-        return;
     }
 }

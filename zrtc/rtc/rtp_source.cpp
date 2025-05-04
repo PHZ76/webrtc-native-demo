@@ -16,6 +16,7 @@ void RtpSource::SetRtx(uint32_t ssrc, uint8_t payload_type)
 {
 	rtx_ssrc_ = ssrc;
 	rtx_payloa_type_ = payload_type;
+	rtp_cache_.resize(RTC_NACK_MAX_RTP_CACHE);
 }
 
 void RtpSource::SetTimestamp(uint32_t timestamp)
@@ -61,11 +62,52 @@ void RtpSource::BuildHeader(std::shared_ptr<RtpPacket> rtp_pkt)
 	WriteUint32BE(&rtp_header[8], rtp_header_.ssrc);
 
 	rtp_pkt->ssrc = rtp_header_.ssrc;
+	rtp_pkt->sequence = rtp_header_.sequence;
 	rtp_pkt->timestamp = rtp_header_.timestamp;
+	rtp_pkt->marker = rtp_header_.marker;
 }
 
+void RtpSource::UpdateRtpCache(std::list<RtpPacketPtr>& rtp_pkts)
+{
+	if (rtx_ssrc_ == 0) {
+		return;
+	}
+
+	for (auto pkt : rtp_pkts) {
+		if (!pkt->is_rtx_) {
+			rtp_cache_[pkt->sequence % RTC_NACK_MAX_RTP_CACHE] = pkt;
+		}
+	}
+}
 
 void RtpSource::RetransmitRtpPackets(std::vector<uint16_t>& lost_seqs)
 {
+	std::list<RtpPacketPtr> rtx_pkts;
+	for (auto lost_seq :  lost_seqs) {
+		auto rtp_packet = rtp_cache_[lost_seq % RTC_NACK_MAX_RTP_CACHE];
+		if (rtp_packet) {
+			auto rtx_packet = std::make_shared<RtpPacket>();
+			uint8_t* rtx_header = rtx_packet->data.get();
+			rtx_header[0] |= RTP_VERSION << 6;
+			rtx_header[0] |= 0;
+			rtx_header[0] |= 0;
+			rtx_header[0] |= 0;
+			rtx_header[1] = rtp_packet->marker << 7 | rtx_payloa_type_;
+			WriteUint16BE(&rtx_header[2], rtx_seq_++);
+			WriteUint32BE(&rtx_header[4], rtp_packet->timestamp);
+			WriteUint32BE(&rtx_header[8], rtx_ssrc_);
 
+			WriteUint16BE(&rtx_header[12], rtp_packet->sequence);
+			memcpy(rtx_packet->data.get() + RTX_HEADER_SIZE, 
+				rtp_packet->data.get() + RTP_HEADER_SIZE, rtp_packet->data_size - RTP_HEADER_SIZE);
+			rtx_packet->data_size = RTX_HEADER_SIZE + rtp_packet->data_size - RTP_HEADER_SIZE;
+			rtx_packet->is_rtx_ = 1;
+			rtx_pkts.push_back(rtx_packet);
+			// RTC_LOG_INFO("retrans rtp:{} --> rtx:{}", rtp_packet->sequence, rtx_seq_ - 1);
+		}
+	}
+
+	if (!rtx_pkts.empty() && send_pkt_callback_) {
+		send_pkt_callback_(rtx_pkts);
+	}
 }

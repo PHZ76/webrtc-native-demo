@@ -79,9 +79,9 @@ bool RtcLiveStream::InitVideo()
 	}
 
 	h264_encoder_ = std::make_shared<ffmpeg::H264Encoder>();
-	video_config_.video.framerate = 25;
-	video_config_.video.bitrate = 2000000;
-	video_config_.video.gop = video_config_.video.framerate;
+	video_config_.video.framerate = 10;
+	video_config_.video.bitrate = 800000;
+	video_config_.video.gop = video_config_.video.framerate * 5;
 	video_config_.video.format = AV_PIX_FMT_BGRA;
 	video_config_.video.width = image.width;
 	video_config_.video.height = image.height;
@@ -166,7 +166,7 @@ bool RtcLiveStream::InitAudio()
 	RTC_LOG_INFO("wasapi samplerate:{} channels:{}", input_samplerate, input_channels);
 
 	opus_encoder_ = std::make_shared<OpusAudioEncoder>();
-	audio_config_.audio.bitrate = 128000;
+	audio_config_.audio.bitrate = 64000;
 	audio_config_.audio.channels = RTC_OPUS_CHANNEL;
 	audio_config_.audio.samplerate = RTC_OPUS_SAMPLE_RATE;
 	audio_config_.audio.format = AV_SAMPLE_FMT_S16;

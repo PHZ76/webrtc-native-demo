@@ -1,5 +1,6 @@
 ﻿#include "h264_encoder.h"
 #include "av_common.h"
+#include <string>
 
 #define USE_LIBYUV 0
 #if USE_LIBYUV
@@ -49,6 +50,13 @@ bool H264Encoder::Init(AVConfig& video_config)
 	codec_context_->rc_min_rate = av_config_.video.bitrate;
 	codec_context_->rc_max_rate = av_config_.video.bitrate;
 	codec_context_->rc_buffer_size = (int)av_config_.video.bitrate;
+	codec_context_->rc_initial_buffer_occupancy = codec_context_->rc_buffer_size * 0.9;
+
+	av_opt_set(codec_context_->priv_data, "vbv_maxrate", std::to_string(av_config_.video.bitrate).c_str(), 0);
+	av_opt_set(codec_context_->priv_data, "vbv_bufsize", std::to_string(av_config_.video.bitrate).c_str(), 0);
+
+	//av_opt_set(codec_context_->priv_data, "aq-mode", "0", 0);
+	//av_opt_set(codec_context_->priv_data, "scenechange", "0", 0);
 
 	codec_context_->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 

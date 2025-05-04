@@ -3,8 +3,10 @@
 #include <cstdint>
 #include <memory>
 
-static const uint32_t RTP_HEADER_SIZE = 12;
 static const uint8_t  RTP_VERSION = 2;
+static const uint32_t RTP_HEADER_SIZE = 12;
+static const uint32_t RTX_HEADER_SIZE = 14;
+
 
 struct RtpHeader
 {
@@ -27,11 +29,15 @@ struct RtpPacket
 		memset(data.get(), 0, 1500);
 	}
 
-	std::shared_ptr<uint8_t> data;
 	uint32_t ssrc = 0;
 	uint32_t timestamp = 0;
+	uint16_t sequence = 0;
+	uint8_t  marker = 0;
+
+	std::shared_ptr<uint8_t> data;
 	uint32_t data_size  = 0;
 	uint8_t  frame_type = 0;
+	uint8_t  is_rtx_ = 0;
 };
 
 using RtpPacketPtr = std::shared_ptr<RtpPacket>;

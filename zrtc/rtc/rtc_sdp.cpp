@@ -90,7 +90,10 @@ std::string RtcSdp::Build()
     //a=extmap:
     ss << "a=rtcp-fb:" << audio_payload_type_ << " transport-cc\n";
     ss << "a=ssrc:" << audio_ssrc_ << " cname:" << stream_name_ << "\n";
+    ss << "a=ssrc:" << audio_ssrc_ << " msid:" << stream_name_ << " " << stream_name_ << "_audio\n";
+    ss << "a=ssrc:" << audio_ssrc_ << " mslabel:" << stream_name_ << "\n";
     ss << "a=ssrc:" << audio_ssrc_ << " label:" << stream_name_ << "_audio\n";
+
     ss << "a=candidate:0 1 UDP 2130706431 " << ip_ << " " << port_ << " typ host generation 0\n";
 
     ss << "m=video 9 UDP/TLS/RTP/SAVPF " << video_payload_type_ << " " << rtx_payload_type_ << "\n";
@@ -115,9 +118,18 @@ std::string RtcSdp::Build()
 
     ss << "a=rtpmap:" << rtx_payload_type_ << " rtx/90000\n";
     ss << "a=fmtp:" << rtx_payload_type_ << " apt=" << video_payload_type_ << "\n";
+    ss << "a=ssrc-group:FID " << video_ssrc_ << " " << rtx_ssrc_ << "\n";
 
+    ss << "a=msid:" << stream_name_ << " " << stream_name_ << "_video\n";
     ss << "a=ssrc:" << video_ssrc_ << " cname:" << stream_name_ << "\n";
+    ss << "a=ssrc:" << video_ssrc_ << " msid:" << stream_name_ << " " << stream_name_ << "_video\n";
+    ss << "a=ssrc:" << video_ssrc_ << " mslabel:" << stream_name_ << "\n";
     ss << "a=ssrc:" << video_ssrc_ << " label:" << stream_name_ << "_video\n";
+    ss << "a=ssrc:" << rtx_ssrc_ << " cname:" << stream_name_ << "\n";
+    ss << "a=ssrc:" << rtx_ssrc_ << " msid:" << stream_name_ << " " << stream_name_ << "_video\n";
+    ss << "a=ssrc:" << rtx_ssrc_ << " mslabel:" << stream_name_ << "\n";
+    ss << "a=ssrc:" << rtx_ssrc_ << " label:" << stream_name_ << "_video\n";
+
     ss << "a=candidate:0 1 UDP 2130706431 " << ip_ << " " << port_ << " typ host generation 0\n";
 
     return ss.str();
@@ -145,9 +157,10 @@ void RtcSdp::SetStreamName(std::string stream_name)
     stream_name_ = stream_name;
 }
 
-void RtcSdp::SetVideoSsrc(uint32_t ssrc)
+void RtcSdp::SetVideoSsrc(uint32_t ssrc, uint32_t rtx_ssrc)
 {
     video_ssrc_ = ssrc;
+    rtx_ssrc_ = rtx_ssrc;
 }
 
 void RtcSdp::SetAudioSsrc(uint32_t ssrc)

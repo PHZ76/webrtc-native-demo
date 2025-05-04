@@ -22,7 +22,7 @@ public:
 	void SetIceParams(std::string ice_ufrag, std::string ice_pwd);
 	void SetFingerprint(std::string fingerprint);
 	void SetStreamName(std::string stream_name);
-	void SetVideoSsrc(uint32_t ssrc);
+	void SetVideoSsrc(uint32_t ssrc, uint32_t rtx_ssrc);
 	void SetAudioSsrc(uint32_t ssrc);
 	void SetVideoPayloadType(uint32_t payload_type, uint32_t rtx_payload_type);
 	void SetAudioPayloadType(uint32_t payload_type);
@@ -38,6 +38,7 @@ private:
 	std::string stream_name_ = "live";
 	uint32_t audio_ssrc_ = 10000;
 	uint32_t video_ssrc_ = 20000;
+	uint32_t rtx_ssrc_ = 0;
 	uint32_t audio_payload_type_ = 111;
 	uint32_t video_payload_type_ = 125;
 	uint32_t rtx_payload_type_ = 120;

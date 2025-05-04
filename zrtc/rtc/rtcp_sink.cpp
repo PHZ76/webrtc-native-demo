@@ -20,11 +20,15 @@ void RtcpSink::OnSenderReportRecord(uint32_t last_sr)
     }
 }
 
-void RtcpSink::GetLostSeq(uint32_t ssrc, std::vector<uint16_t> lost_seqs)
+bool RtcpSink::GetLostSeq(uint32_t ssrc, std::vector<uint16_t>& lost_seqs)
 {
     if (nack_lost_seqs_.count(ssrc)) {
         lost_seqs.swap(nack_lost_seqs_[ssrc]);
         nack_lost_seqs_.erase(ssrc);
+        return lost_seqs.size() > 0;
+    }
+    else {
+        return false;
     }
 }
 
@@ -80,22 +84,26 @@ void RtcpSink::OnReceiverReport(uint8_t* payload, size_t size)
         if (last_sr_records_.count(report_block.last_sr)) {
             uint64_t delay_since_last_sr_ms = report_block.delay_since_last_sr * 1000 / 65536;
             uint64_t rtt = now_time - last_sr_records_[report_block.last_sr] - delay_since_last_sr_ms;
-            //RTC_LOG_INFO("ssrc:{} rtt:{}, lost:{} cumulative_packets_lost:{}", 
-            //    report_block.ssrc, rtt, (report_block.fraction_lost * 100 / 255), report_block.cumulative_packets_lost);
+
+            if (now_time - last_print_time_ > 5000) {
+                last_print_time_ = now_time;
+                RTC_LOG_INFO("ssrc:{} rtt:{}, lost:{}% ",
+                    report_block.ssrc, rtt, (report_block.fraction_lost * 100 / 255));
+            }
         }
     }
 }
 
 void RtcpSink::OnRtpFeedback(uint8_t* payload, size_t size)
 {
+    std::vector<uint16_t> lost_seqs;
+
     uint32_t sender_ssrc = ReadU32BE(payload, size);
     uint32_t media_ssrc = ReadU32BE(payload + 4, size);
 
     for (int index = 8; index < size; index += 4) {
         uint16_t nack_pid = ReadU16BE(payload + index, size);
         uint16_t nack_blp = ReadU16BE(payload + index + 2, size);
-
-        std::vector<uint16_t> lost_seqs;
         lost_seqs.push_back(nack_pid);
 
         for (int i = 0; i < 16; ++i) {
@@ -103,7 +111,7 @@ void RtcpSink::OnRtpFeedback(uint8_t* payload, size_t size)
                 lost_seqs.push_back(nack_pid + 1 + i);
             }
         }
-
-        nack_lost_seqs_.emplace(media_ssrc, lost_seqs);
     }
+
+    nack_lost_seqs_.emplace(media_ssrc, lost_seqs);
 }

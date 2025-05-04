@@ -23,11 +23,16 @@ public:
 	virtual uint32_t GetSSRC();
 
 protected:
+	void UpdateRtpCache(std::list<RtpPacketPtr>& rtp_pkts);
+
 	RtpHeader rtp_header_ = {};
 	SendPacketCallback send_pkt_callback_;
-	uint32_t rtx_ssrc_ = 0;
-	uint32_t rtx_payloa_type_ = 0;
 	uint16_t sequence_ = 1;
 	uint32_t clock_rate_ = 0;
+
+	uint16_t rtx_seq_ = 1;
+	uint32_t rtx_ssrc_ = 0;
+	uint32_t rtx_payloa_type_ = 0;
+	std::vector<RtpPacketPtr> rtp_cache_;
 };
 

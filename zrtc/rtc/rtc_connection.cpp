@@ -63,7 +63,7 @@ bool RtcConnection::Init(RtcRole role)
 		OnSendRtpPackets(rtp_pkts);
 	});
 
-	local_sdp_.SetVideoSsrc(video_ssrc_);
+	local_sdp_.SetVideoSsrc(video_ssrc_, rtx_ssrc_);
 	local_sdp_.SetVideoPayloadType(RTC_MEDIA_CODEC_H264, RTC_MEDIA_CODEC_RTX);
 	rtcp_sources_[video_ssrc_] = std::make_shared<RtcpSource>(video_ssrc_);
 	rtcp_sources_[video_ssrc_]->SetSenderReportInterval(1000);
@@ -107,6 +107,10 @@ void RtcConnection::Destroy()
 
 bool RtcConnection::SendVideoFrame(uint8_t* frame, size_t frame_size)
 {
+	if (!is_handshake_done_) {
+		return false;
+	}
+
 	if (rtp_sources_.count(video_ssrc_)) {
 		auto rtp_source = std::dynamic_pointer_cast<H264RtpSource>(rtp_sources_[video_ssrc_]);
 		if (rtp_source) {
@@ -119,6 +123,10 @@ bool RtcConnection::SendVideoFrame(uint8_t* frame, size_t frame_size)
 
 bool RtcConnection::SendAudioFrame(uint8_t* frame, size_t frame_size)
 {
+	if (!is_handshake_done_) {
+		return false;
+	}
+
 	if (rtp_sources_.count(audio_ssrc_)) {
 		auto rtp_source = std::dynamic_pointer_cast<OpusRtpSource>(rtp_sources_[audio_ssrc_]);
 		if (rtp_source) {
@@ -185,16 +193,18 @@ void RtcConnection::OnSendRtpPackets(std::list<RtpPacketPtr> rtp_pkts)
 		}
 		for (auto pkt : rtp_pkts) {
 			if (pkt) {
-				int rtp_pkt_size = srtp_session_->ProtectRtp(pkt->data.get(), pkt->data_size);
+				uint8_t srtp_buffer[MAX_MTU] = { 0 };
+				memcpy(srtp_buffer, pkt->data.get(), pkt->data_size);
+
+				int rtp_pkt_size = srtp_session_->ProtectRtp(srtp_buffer, pkt->data_size);
 				if (rtp_pkt_size > 0) {
-					OnSend(pkt->data.get(), rtp_pkt_size);
-				}
-				else {
-					break;
-				}
-				if (rtcp_sources_.count(pkt->ssrc)) {
-					auto rtcp_source = rtcp_sources_[pkt->ssrc];
-					rtcp_source->OnSendRtp(pkt->data_size, pkt->timestamp);
+					OnSend(srtp_buffer, rtp_pkt_size);
+
+					// update rtcp stats
+					if (!pkt->is_rtx_ && rtcp_sources_.count(pkt->ssrc)) {
+						auto rtcp_source = rtcp_sources_[pkt->ssrc];
+						rtcp_source->OnSendRtp(pkt->data_size, pkt->timestamp);
+					}
 				}
 			}
 		}
@@ -286,7 +296,9 @@ void RtcConnection::OnRtcpPacket(uint8_t* pkt, size_t size)
 
 	int rtcp_pkt_size = srtp_session_->UnprotectRtcp(pkt, (int)size);
 	if (rtcp_pkt_size > 0 && rtcp_sink_) {
-		rtcp_sink_->Parse(pkt, rtcp_pkt_size);
+		if (rtcp_sink_->Parse(pkt, rtcp_pkt_size)) {
+			CheckNack();
+		}
 	}
 }
 
@@ -312,9 +324,10 @@ void RtcConnection::CheckNack()
 {
 	for (auto rtp_source : rtp_sources_) {
 		std::vector<uint16_t> lost_seqs;
-		rtcp_sink_->GetLostSeq(rtp_source.first, lost_seqs);
-		if (!lost_seqs.empty()) {
-			rtp_source.second->RetransmitRtpPackets(lost_seqs);
+		if (rtcp_sink_->GetLostSeq(rtp_source.first, lost_seqs)) {
+			if (!lost_seqs.empty()) {
+				rtp_source.second->RetransmitRtpPackets(lost_seqs);
+			}
 		}
 	}
 }

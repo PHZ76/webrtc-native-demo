@@ -5,18 +5,16 @@
 #include <memory>
 #include <vector>
 
-#define RTCP_VERSION 2
+static const uint8_t RTCP_VERSION = 2;
+static const uint8_t RTCP_HEADER_SIZE = 4;
 
-#define RTCP_HEADER_SIZE 4
+static const uint8_t RTCP_PT_SENDER_REPORT   = 200;
+static const uint8_t RTCP_PT_RECEIVER_REPORT = 201;
+static const uint8_t RTCP_PT_RTP_FEEDBACK    = 205;
 
-#define RTCP_PT_SENDER_REPORT     200
-#define RTCP_PT_RECEIVER_REPORT   201
-#define RTCP_PT_RTP_FEEDBACK      205
-
-#define RTCP_RC_RTP_FEEDBACK      1
-
-#define RTCP_SENDER_REPORT_SIZE   28
-#define RTCP_BLOCK_SIZE           24
+static const uint8_t RTCP_RC_RTP_FEEDBACK = 1;
+static const uint8_t RTCP_SENDER_REPORT_SIZE = 28;
+static const uint8_t RTCP_BLOCK_SIZE = 24;
 
 struct RtcpHeader
 {
