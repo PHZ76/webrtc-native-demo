@@ -28,7 +28,9 @@ public:
 
 private:
 	void OnReceiverReport(uint8_t* payload, size_t size);
-	void OnRtpFeedback(uint8_t* payload, size_t size);
+	void OnNack(uint8_t* payload, size_t size);
+	void OnFir(uint8_t* payload, size_t size);
+	void OnPLI(uint8_t* payload, size_t size);
 
 	RtcpHeader rtcp_header_ = {};
 	std::map<uint32_t, uint64_t> last_sr_records_;

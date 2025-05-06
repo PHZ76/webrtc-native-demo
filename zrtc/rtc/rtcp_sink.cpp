@@ -42,8 +42,8 @@ bool RtcpSink::Parse(uint8_t* pkt, size_t size)
     rtcp_header_.padding = (pkt[0] & 0x20) ? 1 : 0;
     rtcp_header_.rc = pkt[0] & 0x1f;
     rtcp_header_.payload_type = pkt[1];
-    rtcp_header_.rc = pkt[0] & 0x1f;
     rtcp_header_.length = ReadU16BE(pkt + 2, size - 2);
+    uint8_t fmt = pkt[0] & 0x1f;
     uint8_t* payload = pkt + RTCP_HEADER_SIZE;
     uint32_t pading_size = rtcp_header_.padding ? pkt[size - 1] : 0;
     uint32_t payload_size = rtcp_header_.length * 4 - pading_size;
@@ -54,11 +54,18 @@ bool RtcpSink::Parse(uint8_t* pkt, size_t size)
             OnReceiverReport(payload, payload_size);
         }
         break;
-    case RTCP_PT_RTP_FEEDBACK:
-        if (rtcp_header_.rc == RTCP_RC_RTP_FEEDBACK) {
-            OnRtpFeedback(payload, payload_size);
+    case RTCP_PT_RTPFB:
+        if (fmt == RTCP_PT_RTPFB_NACK) {
+            OnNack(payload, payload_size);
         }
         break;
+    case RTCP_PT_PSFB:
+        if (fmt == RTCP_PT_PSFB_FIR) {
+            OnFir(payload, payload_size);
+        }
+        else if (fmt == RTCP_PT_PSFB_PLI) {
+            OnPLI(payload, payload_size);
+        }
     default:
         break;
     }
@@ -94,7 +101,7 @@ void RtcpSink::OnReceiverReport(uint8_t* payload, size_t size)
     }
 }
 
-void RtcpSink::OnRtpFeedback(uint8_t* payload, size_t size)
+void RtcpSink::OnNack(uint8_t* payload, size_t size)
 {
     std::vector<uint16_t> lost_seqs;
 
@@ -114,4 +121,18 @@ void RtcpSink::OnRtpFeedback(uint8_t* payload, size_t size)
     }
 
     nack_lost_seqs_.emplace(media_ssrc, lost_seqs);
+}
+
+void RtcpSink::OnFir(uint8_t* payload, size_t size)
+{
+    uint32_t sender_ssrc = ReadU32BE(payload, size);
+    uint32_t media_ssrc = ReadU32BE(payload + 4, size);
+    RTC_LOG_INFO("rtcp fir, ssrc:{}", media_ssrc);
+}
+
+void RtcpSink::OnPLI(uint8_t* payload, size_t size)
+{
+    uint32_t sender_ssrc = ReadU32BE(payload, size);
+    uint32_t media_ssrc = ReadU32BE(payload + 4, size);
+    RTC_LOG_INFO("rtcp pli, ssrc:{}", media_ssrc);
 }

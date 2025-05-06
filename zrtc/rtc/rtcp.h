@@ -5,14 +5,18 @@
 #include <memory>
 #include <vector>
 
-static const uint8_t RTCP_VERSION = 2;
-static const uint8_t RTCP_HEADER_SIZE = 4;
+static const uint8_t RTCP_VERSION      = 2;
+static const uint8_t RTCP_HEADER_SIZE  = 4;
 
 static const uint8_t RTCP_PT_SENDER_REPORT   = 200;
 static const uint8_t RTCP_PT_RECEIVER_REPORT = 201;
-static const uint8_t RTCP_PT_RTP_FEEDBACK    = 205;
+static const uint8_t RTCP_PT_RTPFB           = 205;
+static const uint8_t RTCP_PT_PSFB            = 206;
 
-static const uint8_t RTCP_RC_RTP_FEEDBACK = 1;
+static const uint8_t RTCP_PT_RTPFB_NACK      = 1;
+static const uint8_t RTCP_PT_PSFB_PLI        = 1;
+static const uint8_t RTCP_PT_PSFB_FIR        = 4;
+
 static const uint8_t RTCP_SENDER_REPORT_SIZE = 28;
 static const uint8_t RTCP_BLOCK_SIZE = 24;
 
