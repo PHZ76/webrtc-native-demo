@@ -1,7 +1,10 @@
 # WebRTC Native Demo
 
 ## ZRTC
-- rtc native demo
+- rtc native demo, support nack, support fec
+
+## Todo
+- webrtc pacing, webrtc transport-cc
 
 ## Build Environment
 - VS2022
@@ -11,8 +14,5 @@
 - Run zrtc project
 	- Screen capture and play demo using Chrome
 -
-![image](https://github.com/PHZ76/webrtc-native-demo/blob/master/run_env/rtc_test.jpg) 
-
-
-## Todo
-- Support rtcp,transport-cc
+![image](https://github.com/PHZ76/webrtc-native-demo/blob/master/run_env/rtc_test.jpg)
+![image](https://github.com/PHZ76/webrtc-native-demo/blob/master/run_env/fec_test.jpg) 
