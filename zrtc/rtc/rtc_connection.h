@@ -41,10 +41,12 @@ private:
 	void OnRtcpPacket(uint8_t* pkt, size_t size);
 	void CheckSendRtcp();
 	void CheckNack();
+	void UpdateQoS();
 
 	uint32_t audio_ssrc_ = 0;
 	uint32_t video_ssrc_ = 0;
 	uint32_t rtx_ssrc_ = 0;
+	uint32_t fec_ssrc_ = 0;
 	std::unordered_map<uint32_t, std::shared_ptr<RtpSource>> rtp_sources_;
 	std::unordered_map<uint32_t, std::shared_ptr<RtcpSource>> rtcp_sources_;
 	std::shared_ptr<RtcpSink> rtcp_sink_;

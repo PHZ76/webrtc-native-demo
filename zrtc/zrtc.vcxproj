@@ -155,6 +155,7 @@
     <ClCompile Include="capture\wasapi_player.cpp" />
     <ClCompile Include="capture\window_helper.cc" />
     <ClCompile Include="rtc\dtls_connection.cpp" />
+    <ClCompile Include="rtc\fec_encoder.cpp" />
     <ClCompile Include="rtc\h264_parser.cpp" />
     <ClCompile Include="rtc\h264_rtp_source.cpp" />
     <ClCompile Include="rtc\opus_rtp_source.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="capture\window_helper.h" />
     <ClInclude Include="http\httplib.h" />
     <ClInclude Include="rtc\dtls_connection.h" />
+    <ClInclude Include="rtc\fec_encoder.h" />
     <ClInclude Include="rtc\h264_parser.h" />
     <ClInclude Include="rtc\h264_rtp_sender.h" />
     <ClInclude Include="rtc\h264_rtp_source.h" />

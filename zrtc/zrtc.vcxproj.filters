@@ -180,6 +180,9 @@
     <ClCompile Include="rtc\stun_source.cpp">
       <Filter>源文件\rtc</Filter>
     </ClCompile>
+    <ClCompile Include="rtc\fec_encoder.cpp">
+      <Filter>源文件\rtc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="spdlog\spdlog.h">
@@ -372,6 +375,9 @@
       <Filter>源文件\rtc</Filter>
     </ClInclude>
     <ClInclude Include="rtc\stun_source.h">
+      <Filter>源文件\rtc</Filter>
+    </ClInclude>
+    <ClInclude Include="rtc\fec_encoder.h">
       <Filter>源文件\rtc</Filter>
     </ClInclude>
   </ItemGroup>

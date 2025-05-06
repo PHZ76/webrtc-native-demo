@@ -38,6 +38,7 @@ struct RtpPacket
 	uint32_t data_size  = 0;
 	uint8_t  frame_type = 0;
 	uint8_t  is_rtx_ = 0;
+	uint8_t  is_fec_ = 0;
 };
 
 using RtpPacketPtr = std::shared_ptr<RtpPacket>;

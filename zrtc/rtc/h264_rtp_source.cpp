@@ -80,6 +80,7 @@ void H264RtpSource::HandleIDRFrame(uint8_t* frame_data, size_t frame_size)
 
     if (rtp_pkts.size() > 0 && send_pkt_callback_) {
         UpdateRtpCache(rtp_pkts);
+        GeneratedFecPacket(rtp_pkts);
         send_pkt_callback_(rtp_pkts);
     }
 }
@@ -100,6 +101,7 @@ void H264RtpSource::HandleRefFrame(uint8_t* frame_data, size_t frame_size)
 
     if (rtp_pkts.size() > 0 && send_pkt_callback_) {
         UpdateRtpCache(rtp_pkts);
+        GeneratedFecPacket(rtp_pkts);
         send_pkt_callback_(rtp_pkts);
     }
 }

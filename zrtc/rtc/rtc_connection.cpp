@@ -13,8 +13,9 @@ RtcConnection::RtcConnection(std::shared_ptr<xop::EventLoop> event_loop)
 	video_ssrc_ = GenerateSSRC();
 	audio_ssrc_ = GenerateSSRC();
 	rtx_ssrc_ = GenerateSSRC();
-
-	RTC_LOG_INFO("create peer connection, video_ssrc:{} audio_ssrc:{} video_rtx_ssrc:{}", video_ssrc_, audio_ssrc_, rtx_ssrc_);
+	fec_ssrc_ = GenerateSSRC();
+	RTC_LOG_INFO("create peer connection, video_ssrc:{} audio_ssrc:{} rtx_ssrc:{} fec_ssrc:{}", 
+		video_ssrc_, audio_ssrc_, rtx_ssrc_, fec_ssrc_);
 }
 
 RtcConnection::~RtcConnection()
@@ -54,8 +55,7 @@ bool RtcConnection::Init(RtcRole role)
 	local_sdp_.SetFingerprint(dtls_connection_->GetFingerprint());
 	local_sdp_.SetStreamName(stream_name_);
 
-	local_sdp_.SetAudioSsrc(audio_ssrc_);
-	local_sdp_.SetAudioPayloadType(RTC_MEDIA_CODEC_OPUS);
+	local_sdp_.SetAudio(audio_ssrc_, RTC_MEDIA_CODEC_OPUS);
 	rtcp_sources_[audio_ssrc_] = std::make_shared<RtcpSource>(audio_ssrc_);
 	rtcp_sources_[audio_ssrc_]->SetSenderReportInterval(5000);
 	rtp_sources_[audio_ssrc_] = std::make_shared<OpusRtpSource>(audio_ssrc_, RTC_MEDIA_CODEC_OPUS);
@@ -63,12 +63,14 @@ bool RtcConnection::Init(RtcRole role)
 		OnSendRtpPackets(rtp_pkts);
 	});
 
-	local_sdp_.SetVideoSsrc(video_ssrc_, rtx_ssrc_);
-	local_sdp_.SetVideoPayloadType(RTC_MEDIA_CODEC_H264, RTC_MEDIA_CODEC_RTX);
+	local_sdp_.SetVideo(video_ssrc_, RTC_MEDIA_CODEC_H264);
+	local_sdp_.SetVideoRtx(rtx_ssrc_, RTC_MEDIA_CODEC_RTX);
+	local_sdp_.SetVideoFec(fec_ssrc_, RTC_MEDIA_CODEC_FEC);
 	rtcp_sources_[video_ssrc_] = std::make_shared<RtcpSource>(video_ssrc_);
 	rtcp_sources_[video_ssrc_]->SetSenderReportInterval(1000);
 	rtp_sources_[video_ssrc_] = std::make_shared<H264RtpSource>(video_ssrc_, RTC_MEDIA_CODEC_H264);
 	rtp_sources_[video_ssrc_]->SetRtx(rtx_ssrc_, RTC_MEDIA_CODEC_RTX);
+	rtp_sources_[video_ssrc_]->SetFec(fec_ssrc_, RTC_MEDIA_CODEC_FEC);
 	rtp_sources_[video_ssrc_]->SetSendPacketCallback([this](std::list<RtpPacketPtr> rtp_pkts) {
 		OnSendRtpPackets(rtp_pkts);
 	});
@@ -201,7 +203,7 @@ void RtcConnection::OnSendRtpPackets(std::list<RtpPacketPtr> rtp_pkts)
 					OnSend(srtp_buffer, rtp_pkt_size);
 
 					// update rtcp stats
-					if (!pkt->is_rtx_ && rtcp_sources_.count(pkt->ssrc)) {
+					if (!pkt->is_rtx_ && !pkt->is_fec_ && rtcp_sources_.count(pkt->ssrc)) {
 						auto rtcp_source = rtcp_sources_[pkt->ssrc];
 						rtcp_source->OnSendRtp(pkt->data_size, pkt->timestamp);
 					}
@@ -298,6 +300,7 @@ void RtcConnection::OnRtcpPacket(uint8_t* pkt, size_t size)
 	if (rtcp_pkt_size > 0 && rtcp_sink_) {
 		if (rtcp_sink_->Parse(pkt, rtcp_pkt_size)) {
 			CheckNack();
+			UpdateQoS();
 		}
 	}
 }
@@ -329,5 +332,14 @@ void RtcConnection::CheckNack()
 				rtp_source.second->RetransmitRtpPackets(lost_seqs);
 			}
 		}
+	}
+}
+
+void RtcConnection::UpdateQoS()
+{
+	for (auto rtp_source : rtp_sources_) {
+		uint32_t rtt = rtcp_sink_->GetRTT(rtp_source.first);
+		uint32_t loss_rate = rtcp_sink_->GetLossRate(rtp_source.first);
+		rtp_source.second->UpdateQoS(rtt, loss_rate);
 	}
 }

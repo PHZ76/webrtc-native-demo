@@ -26,6 +26,9 @@ public:
 	void OnSenderReportRecord(uint32_t last_sr);
 	bool GetLostSeq(uint32_t ssrc, std::vector<uint16_t>& lost_seqs);
 
+	uint32_t GetLossRate(uint32_t ssrc);
+	uint32_t GetRTT(uint32_t ssrc);
+
 private:
 	void OnReceiverReport(uint8_t* payload, size_t size);
 	void OnNack(uint8_t* payload, size_t size);
@@ -35,6 +38,8 @@ private:
 	RtcpHeader rtcp_header_ = {};
 	std::map<uint32_t, uint64_t> last_sr_records_;
 	std::map<uint32_t, std::vector<uint16_t>> nack_lost_seqs_;
+	std::map<uint32_t, uint32_t> rtt_;
+	std::map<uint32_t, uint32_t> loss_rate_;
 
 	uint64_t last_print_time_ = 0;
 };

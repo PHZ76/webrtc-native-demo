@@ -38,6 +38,7 @@ enum RtcMediaCodec
 	RTC_MEDIA_CODEC_OPUS = 111,
 
 	RTC_MEDIA_CODEC_RTX  = 120,
+	RTC_MEDIA_CODEC_FEC  = 122,
 };
 
 enum RtcRole

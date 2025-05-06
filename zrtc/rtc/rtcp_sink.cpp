@@ -32,6 +32,26 @@ bool RtcpSink::GetLostSeq(uint32_t ssrc, std::vector<uint16_t>& lost_seqs)
     }
 }
 
+uint32_t RtcpSink::GetLossRate(uint32_t ssrc)
+{
+    if (loss_rate_.count(ssrc)) {
+        return loss_rate_[ssrc];
+    }
+    else {
+        return 0;
+    }
+}
+
+uint32_t RtcpSink::GetRTT(uint32_t ssrc)
+{
+    if (rtt_.count(ssrc)) {
+        return rtt_[ssrc];
+    }
+    else {
+        return 1;
+    }
+}
+
 bool RtcpSink::Parse(uint8_t* pkt, size_t size)
 {
     if (size < RTCP_HEADER_SIZE) {
@@ -97,6 +117,9 @@ void RtcpSink::OnReceiverReport(uint8_t* payload, size_t size)
                 RTC_LOG_INFO("ssrc:{} rtt:{}, lost:{}% ",
                     report_block.ssrc, rtt, (report_block.fraction_lost * 100 / 255));
             }
+
+            rtt_[report_block.ssrc] = rtt;
+            loss_rate_[report_block.ssrc] = static_cast<uint32_t>(report_block.fraction_lost * 100 / 255);
         }
     }
 }

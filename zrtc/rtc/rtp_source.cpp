@@ -19,6 +19,13 @@ void RtpSource::SetRtx(uint32_t ssrc, uint8_t payload_type)
 	rtp_cache_.resize(RTC_NACK_MAX_RTP_CACHE);
 }
 
+void RtpSource::SetFec(uint32_t fec_ssrc, uint8_t payload_type)
+{
+	fec_ssrc_ = fec_ssrc;
+	fec_payloa_type_ = payload_type;
+	fec_encoder_ = std::make_shared<FecEncoder>(rtp_header_.ssrc, fec_ssrc, fec_payloa_type_);
+}
+
 void RtpSource::SetTimestamp(uint32_t timestamp)
 {
 	rtp_header_.timestamp = timestamp;
@@ -80,8 +87,23 @@ void RtpSource::UpdateRtpCache(std::list<RtpPacketPtr>& rtp_pkts)
 	}
 }
 
+void RtpSource::UpdateQoS(uint32_t rtt, uint32_t loss_rate)
+{
+	rtt_ = rtt;
+	smooth_rtt_ = (smooth_rtt_ * 3 + rtt_ * 1) >> 2; // 3/4 + 1/4
+	loss_rate_ = loss_rate;
+
+	if (fec_encoder_) {
+		fec_encoder_->UpdateLossRate(loss_rate);
+	}
+}
+
 void RtpSource::RetransmitRtpPackets(std::vector<uint16_t>& lost_seqs)
 {
+	if (rtx_ssrc_ == 0) {
+		return;
+	}
+
 	std::list<RtpPacketPtr> rtx_pkts;
 	for (auto lost_seq :  lost_seqs) {
 		auto rtp_packet = rtp_cache_[lost_seq % RTC_NACK_MAX_RTP_CACHE];
@@ -109,5 +131,25 @@ void RtpSource::RetransmitRtpPackets(std::vector<uint16_t>& lost_seqs)
 
 	if (!rtx_pkts.empty() && send_pkt_callback_) {
 		send_pkt_callback_(rtx_pkts);
+	}
+}
+
+void RtpSource::GeneratedFecPacket(std::list<RtpPacketPtr>& rtp_pkts)
+{
+	if (fec_ssrc_ == 0) {
+		return;
+	}
+
+	std::list<RtpPacketPtr> rtp_fec_pkts;
+	for (auto rtp_pkt : rtp_pkts) {
+		fec_encoder_->AddRtpPacket(rtp_pkt);
+		auto fec_packets = fec_encoder_->GetFecPackets();
+		if (!fec_packets.empty()) {
+			rtp_fec_pkts.insert(rtp_fec_pkts.end(), fec_packets.begin(), fec_packets.end());
+		}
+	}
+
+	if (!rtp_fec_pkts.empty()) {
+		rtp_pkts.insert(rtp_pkts.end(), rtp_fec_pkts.begin(), rtp_fec_pkts.end());
 	}
 }
