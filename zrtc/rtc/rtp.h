@@ -5,8 +5,12 @@
 
 static const uint8_t  RTP_VERSION = 2;
 static const uint32_t RTP_HEADER_SIZE = 12;
-static const uint32_t RTX_HEADER_SIZE = 14;
+static const uint32_t RTX_EXTENSION_HEADER_SIZE = 4;
 
+enum RtpExtensionType
+{
+	RTP_EXTENSION_TWCC = 1,
+};
 
 struct RtpHeader
 {

@@ -32,6 +32,7 @@ public:
 private:
 	void OnReceiverReport(uint8_t* payload, size_t size);
 	void OnNack(uint8_t* payload, size_t size);
+	void OnTransportFeedback(uint8_t* payload, size_t size);
 	void OnFir(uint8_t* payload, size_t size);
 	void OnPLI(uint8_t* payload, size_t size);
 

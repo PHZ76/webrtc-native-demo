@@ -87,7 +87,7 @@ std::string RtcSdp::Build()
     ss << "a=sendonly\n";
     ss << "a=rtcp-mux\n";
     ss << "a=rtcp-rsize\n";
-    //a=extmap:
+    ss << "a=extmap:1 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\n";
     ss << "a=rtcp-fb:" << audio_payload_type_ << " transport-cc\n";
     ss << "a=ssrc:" << audio_ssrc_ << " cname:" << stream_name_ << "\n";
     ss << "a=ssrc:" << audio_ssrc_ << " msid:" << stream_name_ << " " << stream_name_ << "_audio\n";
@@ -107,8 +107,8 @@ std::string RtcSdp::Build()
     ss << "a=sendonly\n";
     ss << "a=rtcp-mux\n";
     ss << "a=rtcp-rsize\n";
-    //a=extmap:
-    //ss << "a=rtcp-fb:" << video_payload_type_ << " ccm fir\n";
+    ss << "a=extmap:1 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\n";
+    ss << "a=rtcp-fb:" << video_payload_type_ << " ccm fir\n";
     //ss << "a=rtcp-fb:" << video_payload_type_ << " goog-remb\n";
     ss << "a=rtcp-fb:" << video_payload_type_ << " transport-cc\n";
     ss << "a=rtcp-fb:" << video_payload_type_ << " nack\n";

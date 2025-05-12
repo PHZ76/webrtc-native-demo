@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include <random>
+#include <atomic>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>

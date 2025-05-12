@@ -15,6 +15,7 @@ public:
 
 	virtual void SetRtx(uint32_t rtx_ssrc, uint8_t payload_type);
 	virtual void SetFec(uint32_t fec_ssrc, uint8_t payload_type);
+	virtual void SetExtension(RtpExtensionType ext_type);
 	virtual void SetTimestamp(uint32_t timestamp);
 	virtual void SetMarker(uint8_t marker);
 	virtual void SetSequence(uint32_t sequence);
@@ -24,6 +25,7 @@ public:
 	virtual uint32_t GetTimestamp();
 	virtual uint32_t GetSSRC();
 
+	virtual void UpdateExtSequence(RtpPacketPtr& rtp_packet, uint16_t conn_seq);
 	virtual void UpdateQoS(uint32_t rtt, uint32_t loss_rate);
 
 protected:
@@ -32,6 +34,8 @@ protected:
 
 	RtpHeader rtp_header_ = {};
 	SendPacketCallback send_pkt_callback_;
+	uint32_t header_size_ = 0;
+	uint32_t extension_size_ = 0;
 	uint16_t sequence_ = 1;
 	uint32_t clock_rate_ = 0;
 
@@ -40,12 +44,15 @@ protected:
 	uint32_t rtx_payloa_type_ = 0;
 	std::vector<RtpPacketPtr> rtp_cache_;
 
+	uint16_t fec_seq_ = 1;
 	uint32_t fec_ssrc_ = 0;
-	uint32_t fec_payloa_type_ = 0;
+	uint32_t fec_payload_type_ = 0;
 	std::shared_ptr<FecEncoder> fec_encoder_;
 
 	uint32_t rtt_ = 0;
 	uint32_t smooth_rtt_ = 0;
 	uint32_t loss_rate_ = 0;
+
+	std::map<RtpExtensionType, uint32_t> extension_pos_;
 };
 

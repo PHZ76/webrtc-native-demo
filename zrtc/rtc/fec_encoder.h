@@ -13,13 +13,12 @@ public:
 	void UpdateLossRate(uint32_t loss_rate);
 	void AddRtpPacket(std::shared_ptr<RtpPacket> rtp_packet);
 	
-	std::list<std::shared_ptr<RtpPacket>> GetFecPackets();
+	void GetFecPackets(std::list<webrtc::ForwardErrorCorrection::Packet*>& fec_packets);
 
 private:
 	uint32_t media_ssrc_ = 0;
 	uint32_t fec_ssrc_ = 0;
 	uint32_t fec_payload_type_ = 0;
-	uint16_t fec_seq_ = 1;
 	uint32_t loss_rate_ = 0;
 	uint32_t smoothed_loss_rate_ = 0;
 	std::unique_ptr<webrtc::ForwardErrorCorrection> fec_;

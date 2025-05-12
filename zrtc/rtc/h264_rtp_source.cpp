@@ -64,7 +64,7 @@ void H264RtpSource::HandlePPSFrame(uint8_t* frame_data, size_t frame_size)
 void H264RtpSource::HandleIDRFrame(uint8_t* frame_data, size_t frame_size)
 {
     std::list<RtpPacketPtr> rtp_pkts;
-    max_rtp_payload_size_ = RTC_MAX_RTP_PACKET_LENGTH - RTP_HEADER_SIZE;
+    max_rtp_payload_size_ = RTC_MAX_RTP_PACKET_LENGTH - header_size_;
     timestamp_ = GetH264Timestamp();
     SetTimestamp(timestamp_);
 
@@ -88,7 +88,7 @@ void H264RtpSource::HandleIDRFrame(uint8_t* frame_data, size_t frame_size)
 void H264RtpSource::HandleRefFrame(uint8_t* frame_data, size_t frame_size)
 {
     std::list<RtpPacketPtr> rtp_pkts;
-    max_rtp_payload_size_ = RTC_MAX_RTP_PACKET_LENGTH - RTP_HEADER_SIZE;
+    max_rtp_payload_size_ = RTC_MAX_RTP_PACKET_LENGTH - header_size_;
     timestamp_ = GetH264Timestamp();
     SetTimestamp(timestamp_);
 
@@ -112,8 +112,8 @@ void H264RtpSource::BuildRtp(uint8_t* frame_data, size_t frame_size, std::list<R
     SetMarker(1);
     SetSequence(sequence_++);
     BuildHeader(rtp_pkt);
-    memcpy(rtp_pkt->data.get() + RTP_HEADER_SIZE, frame_data, frame_size);
-    rtp_pkt->data_size = RTP_HEADER_SIZE + static_cast<uint32_t>(frame_size);
+    memcpy(rtp_pkt->data.get() + header_size_, frame_data, frame_size);
+    rtp_pkt->data_size = header_size_ + static_cast<uint32_t>(frame_size);
     rtp_pkts.push_back(rtp_pkt);
 }
 
@@ -125,7 +125,7 @@ void H264RtpSource::BuildRtpSTAPA(uint8_t* frame_data, size_t frame_size, std::l
     SetMarker(0);
     SetSequence(sequence_++);
     BuildHeader(rtp_pkt);
-    rtp_data_ += RTP_HEADER_SIZE;
+    rtp_data_ += header_size_;
     rtp_data_[0] = sps_.get()[0] & (~0x1f) | 24;
     rtp_data_ += 1;
     WriteUint16BE(rtp_data_, sps_size_);
@@ -138,7 +138,7 @@ void H264RtpSource::BuildRtpSTAPA(uint8_t* frame_data, size_t frame_size, std::l
     memcpy(rtp_data_, pps_.get(), pps_size_);
     rtp_data_ += pps_size_;
 
-    rtp_pkt->data_size = RTP_HEADER_SIZE + sps_size_ + pps_size_ + 5;
+    rtp_pkt->data_size = header_size_ + sps_size_ + pps_size_ + 5;
     rtp_pkts.push_back(rtp_pkt);
 }
 
@@ -159,10 +159,10 @@ void H264RtpSource::BuildRtpFUA(uint8_t* frame_data, size_t frame_size, std::lis
         SetMarker(0);
         SetSequence(sequence_++);
         BuildHeader(rtp_pkt);
-        rtp_pkt->data.get()[RTP_HEADER_SIZE + 0] = fu_a[0];
-        rtp_pkt->data.get()[RTP_HEADER_SIZE + 1] = fu_a[1];
-        memcpy(rtp_pkt->data.get() + RTP_HEADER_SIZE + fu_a_size, frame_data, max_rtp_payload_size_ - fu_a_size);
-        rtp_pkt->data_size = RTP_HEADER_SIZE + max_rtp_payload_size_;
+        rtp_pkt->data.get()[header_size_ + 0] = fu_a[0];
+        rtp_pkt->data.get()[header_size_ + 1] = fu_a[1];
+        memcpy(rtp_pkt->data.get() + header_size_ + fu_a_size, frame_data, max_rtp_payload_size_ - fu_a_size);
+        rtp_pkt->data_size = header_size_ + max_rtp_payload_size_;
         rtp_pkts.push_back(rtp_pkt);
 
         frame_data += max_rtp_payload_size_ - fu_a_size;
@@ -176,10 +176,10 @@ void H264RtpSource::BuildRtpFUA(uint8_t* frame_data, size_t frame_size, std::lis
         SetSequence(sequence_++);
         BuildHeader(rtp_pkt);
         fu_a[1] |= 0x40;
-        rtp_pkt->data.get()[RTP_HEADER_SIZE + 0] = fu_a[0];
-        rtp_pkt->data.get()[RTP_HEADER_SIZE + 1] = fu_a[1];
-        memcpy(rtp_pkt->data.get() + RTP_HEADER_SIZE + fu_a_size, frame_data, frame_size);
-        rtp_pkt->data_size = RTP_HEADER_SIZE + fu_a_size + static_cast<uint32_t>(frame_size);
+        rtp_pkt->data.get()[header_size_ + 0] = fu_a[0];
+        rtp_pkt->data.get()[header_size_ + 1] = fu_a[1];
+        memcpy(rtp_pkt->data.get() + header_size_ + fu_a_size, frame_data, frame_size);
+        rtp_pkt->data_size = header_size_ + fu_a_size + static_cast<uint32_t>(frame_size);
         rtp_pkts.push_back(rtp_pkt);
     }
 }

@@ -14,6 +14,7 @@ static const uint8_t RTCP_PT_RTPFB           = 205;
 static const uint8_t RTCP_PT_PSFB            = 206;
 
 static const uint8_t RTCP_PT_RTPFB_NACK      = 1;
+static const uint8_t RTCP_PT_RTPFB_TWCC      = 15;
 static const uint8_t RTCP_PT_PSFB_PLI        = 1;
 static const uint8_t RTCP_PT_PSFB_FIR        = 4;
 

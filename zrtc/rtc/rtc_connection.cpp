@@ -59,6 +59,7 @@ bool RtcConnection::Init(RtcRole role)
 	rtcp_sources_[audio_ssrc_] = std::make_shared<RtcpSource>(audio_ssrc_);
 	rtcp_sources_[audio_ssrc_]->SetSenderReportInterval(5000);
 	rtp_sources_[audio_ssrc_] = std::make_shared<OpusRtpSource>(audio_ssrc_, RTC_MEDIA_CODEC_OPUS);
+	rtp_sources_[audio_ssrc_]->SetExtension(RTP_EXTENSION_TWCC);
 	rtp_sources_[audio_ssrc_]->SetSendPacketCallback([this](std::list<RtpPacketPtr> rtp_pkts) {
 		OnSendRtpPackets(rtp_pkts);
 	});
@@ -71,6 +72,7 @@ bool RtcConnection::Init(RtcRole role)
 	rtp_sources_[video_ssrc_] = std::make_shared<H264RtpSource>(video_ssrc_, RTC_MEDIA_CODEC_H264);
 	rtp_sources_[video_ssrc_]->SetRtx(rtx_ssrc_, RTC_MEDIA_CODEC_RTX);
 	rtp_sources_[video_ssrc_]->SetFec(fec_ssrc_, RTC_MEDIA_CODEC_FEC);
+	rtp_sources_[video_ssrc_]->SetExtension(RTP_EXTENSION_TWCC);
 	rtp_sources_[video_ssrc_]->SetSendPacketCallback([this](std::list<RtpPacketPtr> rtp_pkts) {
 		OnSendRtpPackets(rtp_pkts);
 	});
@@ -190,11 +192,11 @@ int RtcConnection::OnSend(uint8_t* pkt, size_t pkt_size)
 void RtcConnection::OnSendRtpPackets(std::list<RtpPacketPtr> rtp_pkts)
 {
 	event_loop_->AddTriggerEvent([this, rtp_pkts] {
-		if (!is_handshake_done_) {
-			return;
-		}
 		for (auto pkt : rtp_pkts) {
 			if (pkt) {
+				// twcc seq
+				rtp_sources_[pkt->ssrc]->UpdateExtSequence(pkt, connection_seq_++);
+
 				uint8_t srtp_buffer[MAX_MTU] = { 0 };
 				memcpy(srtp_buffer, pkt->data.get(), pkt->data_size);
 
@@ -215,11 +217,11 @@ void RtcConnection::OnSendRtpPackets(std::list<RtpPacketPtr> rtp_pkts)
 
 void RtcConnection::OnSendRtcpPackets(std::list<RtcpPacketPtr> rtcp_pkts)
 {
-	event_loop_->AddTriggerEvent([this, rtcp_pkts] {
-		if (!is_handshake_done_) {
-			return;
-		}
+	if (!is_handshake_done_) {
+		return;
+	}
 
+	event_loop_->AddTriggerEvent([this, rtcp_pkts] {
 		for (auto pkt : rtcp_pkts) {
 			if (pkt) {
 				int rtcp_pkt_size = srtp_session_->ProtectRtcp(pkt->data.get(), pkt->data_size);

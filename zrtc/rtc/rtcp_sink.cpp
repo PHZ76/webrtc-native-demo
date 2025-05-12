@@ -78,6 +78,9 @@ bool RtcpSink::Parse(uint8_t* pkt, size_t size)
         if (fmt == RTCP_PT_RTPFB_NACK) {
             OnNack(payload, payload_size);
         }
+        else if (fmt == RTCP_PT_RTPFB_TWCC) {
+            OnTransportFeedback(payload, payload_size);
+        }
         break;
     case RTCP_PT_PSFB:
         if (fmt == RTCP_PT_PSFB_FIR) {
@@ -118,7 +121,7 @@ void RtcpSink::OnReceiverReport(uint8_t* payload, size_t size)
                     report_block.ssrc, rtt, (report_block.fraction_lost * 100 / 255));
             }
 
-            rtt_[report_block.ssrc] = rtt;
+            rtt_[report_block.ssrc] = static_cast<uint32_t>(rtt);
             loss_rate_[report_block.ssrc] = static_cast<uint32_t>(report_block.fraction_lost * 100 / 255);
         }
     }
@@ -144,6 +147,11 @@ void RtcpSink::OnNack(uint8_t* payload, size_t size)
     }
 
     nack_lost_seqs_.emplace(media_ssrc, lost_seqs);
+}
+
+void RtcpSink::OnTransportFeedback(uint8_t* payload, size_t size)
+{
+
 }
 
 void RtcpSink::OnFir(uint8_t* payload, size_t size)

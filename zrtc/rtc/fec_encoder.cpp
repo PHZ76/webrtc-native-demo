@@ -1,11 +1,5 @@
 #include "fec_encoder.h"
 
-static uint32_t GetH264Timestamp()
-{
-	return static_cast<uint32_t>((std::chrono::time_point_cast<std::chrono::microseconds>(
-		std::chrono::steady_clock::now()).time_since_epoch().count() + 500) / 1000 * 90); // 90:(clock_rate / 1000)
-}
-
 FecEncoder::FecEncoder(uint32_t media_ssrc, uint32_t fec_ssrc, uint32_t fec_payload_type)
 	: media_ssrc_(media_ssrc)
 	, fec_ssrc_(fec_ssrc)
@@ -53,31 +47,11 @@ void FecEncoder::AddRtpPacket(std::shared_ptr<RtpPacket> rtp_packet)
 	}
 }
 
-std::list<std::shared_ptr<RtpPacket>> FecEncoder::GetFecPackets()
+void FecEncoder::GetFecPackets(std::list<webrtc::ForwardErrorCorrection::Packet*>& fec_packets)
 {
-	std::list<std::shared_ptr<RtpPacket>> fec_packets;
-
-	for (const auto* fec_pkt : fec_packets_) {
-		auto rtp_fec_packet = std::make_shared<RtpPacket>();
-		rtp_fec_packet->ssrc = fec_ssrc_;
-		rtp_fec_packet->is_fec_ = 1;
-		rtp_fec_packet->marker = 0;
-
-		uint8_t* rtp_header = rtp_fec_packet->data.get();
-		rtp_header[0] |= RTP_VERSION << 6;
-		rtp_header[1] = rtp_fec_packet->marker << 7 | fec_payload_type_;
-		WriteUint16BE(&rtp_header[2], fec_seq_++);
-		WriteUint32BE(&rtp_header[4], GetH264Timestamp());
-		WriteUint32BE(&rtp_header[8], fec_ssrc_);
-
-		memcpy(rtp_fec_packet->data.get() + RTP_HEADER_SIZE, fec_pkt->data.cdata(), fec_pkt->data.size());
-		rtp_fec_packet->data_size = RTP_HEADER_SIZE + static_cast<uint32_t>(fec_pkt->data.size());
-		fec_packets.push_back(rtp_fec_packet);
-	}
-
-	if (!fec_packets_.empty()) {
+	fec_packets.swap(fec_packets_);
+	if (!fec_packets.empty()) {
 		fec_packets_.clear();
 		media_packets_.clear();
 	}
-	return fec_packets;
 }

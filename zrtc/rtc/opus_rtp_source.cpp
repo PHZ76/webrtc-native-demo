@@ -22,8 +22,8 @@ void OpusRtpSource::InputFrame(uint8_t* frame_data, size_t frame_size)
     SetMarker(1);
     SetSequence(sequence_++);
     BuildHeader(rtp_pkt);
-    memcpy(rtp_pkt->data.get() + RTP_HEADER_SIZE, frame_data, frame_size);
-    rtp_pkt->data_size = RTP_HEADER_SIZE + static_cast<uint32_t>(frame_size);
+    memcpy(rtp_pkt->data.get() + header_size_, frame_data, frame_size);
+    rtp_pkt->data_size = header_size_ + static_cast<uint32_t>(frame_size);
     rtp_pkts.push_back(rtp_pkt);
 
     if (rtp_pkts.size() > 0 && send_pkt_callback_) {
